@@ -33,6 +33,17 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
       select: false, // Do not return password by default
     },
+    location: {
+      state: { type: String },
+      district: { type: String },
+      city: { type: String },
+      pincode: { type: String },
+      building: { type: String },
+      area: { type: String },
+      landmark: { type: String },
+      lat: { type: Number },
+      lng: { type: Number },
+    },
   },
   {
     timestamps: true,

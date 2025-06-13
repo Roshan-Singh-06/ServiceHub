@@ -107,3 +107,29 @@ export const refreshAccessToken = asyncHandler(async (req, res, next) => {
     throw new ApiError(401, 'Invalid or expired refresh token');
   }
 });
+
+// Update user location
+export const updateUserLocation = asyncHandler(async (req, res, next) => {
+  const { userId } = req.body; // or get from auth middleware
+  const { state, district, city, pincode, building, area, landmark, lat, lng } = req.body;
+
+  if (!userId || !state || !district || !city) {
+    throw new ApiError(400, 'State, district, and city are required');
+  }
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        location: { state, district, city, pincode, building, area, landmark, lat, lng }
+      }
+    },
+    { new: true }
+  );
+
+  if (!user) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  res.status(200).json(new ApiResponse(200, user, 'Location updated successfully'));
+});

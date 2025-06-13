@@ -225,8 +225,8 @@ export default function PlumberSection() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-[#1f4959] via-[#5c7c89] to-[#1f4959] rounded-2xl shadow-xl border-4 border-[#5c7c89] p-8 w-full max-w-xs">
-            <h2 className="text-2xl font-bold text-white mb-6 text-center">Cart</h2>
+          <div className="bg-[#5c7c89 rounded-2xl shadow-xl border-4 border-[#5c7c89] p-8 w-full max-w-xs">
+            <h2 className="text-2xl font-bold  text-[#1f4959] mb-6 text-center">Cart</h2>
             {Object.keys(cart).length === 0 ? (
               <p className="text-center text-sm text-[#b0c4ce]">No items added</p>
             ) : (
