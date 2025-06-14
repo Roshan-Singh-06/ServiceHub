@@ -1,6 +1,25 @@
 import axios from 'axios';
 import { State } from 'country-state-city';
 
+// In-memory cache for API results (simple, resets on server restart)
+const cache = {};
+const CACHE_TTL = 60 * 60 * 1000; // 1 hour
+
+const getCacheKey = (url, field) => `${url}|${field}`;
+
+// Helper to fetch and deduplicate fields from community API
+const fetchAndExtractUnique = async (url, field) => {
+  const cacheKey = getCacheKey(url, field);
+  const now = Date.now();
+  if (cache[cacheKey] && now - cache[cacheKey].timestamp < CACHE_TTL) {
+    return cache[cacheKey].data;
+  }
+  const response = await axios.get(url);
+  const data = Array.from(new Set(response.data.map(item => item[field]))).filter(Boolean);
+  cache[cacheKey] = { data, timestamp: now };
+  return data;
+};
+
 // Get all Indian states
 const getStates = (req, res) => {
   try {
@@ -11,26 +30,21 @@ const getStates = (req, res) => {
   }
 };
 
-// Get districts for a state
+// Get districts for a state using community API
 const getDistricts = async (req, res) => {
   const { stateName } = req.query;
   if (!stateName) return res.status(400).json({ error: 'State name required' });
 
   try {
-    const response = await axios.get(
-      `https://api.api-ninjas.com/v1/indian_cities?state=${encodeURIComponent(stateName)}`,
-      { headers: { 'X-Api-Key': process.env.NINJA_API_KEY } }
-    );
-    console.log('API response:', response.data);
-    const districts = Array.from(new Set(response.data.map(city => city.district))).filter(Boolean);
+    const url = `https://indian-cities-api-nocbegfhqg.now.sh/cities?State=${encodeURIComponent(stateName)}`;
+    const districts = await fetchAndExtractUnique(url, 'District');
     res.json(districts);
   } catch (err) {
-    console.error('District fetch error:', err.response ? err.response.data : err.message);
     res.status(500).json({ error: 'Failed to fetch districts', details: err.response ? err.response.data : err.message });
   }
 };
 
-// Get cities for a state and district
+// Get cities for a state and district using community API
 const getCities = async (req, res) => {
   const { stateName, district } = req.query;
   if (!stateName || !district) {
@@ -38,14 +52,11 @@ const getCities = async (req, res) => {
   }
 
   try {
-    const response = await axios.get(
-      `https://api.api-ninjas.com/v1/indian_cities?state=${encodeURIComponent(stateName)}&district=${encodeURIComponent(district)}`,
-      { headers: { 'X-Api-Key': process.env.NINJA_API_KEY } }
-    );
-    const cities = Array.from(new Set(response.data.map(city => city.city))).filter(Boolean);
+    const url = `https://indian-cities-api-nocbegfhqg.now.sh/cities?State=${encodeURIComponent(stateName)}&District=${encodeURIComponent(district)}`;
+    const cities = await fetchAndExtractUnique(url, 'City');
     res.json(cities);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch cities' });
+    res.status(500).json({ error: 'Failed to fetch cities', details: err.response ? err.response.data : err.message });
   }
 };
 
