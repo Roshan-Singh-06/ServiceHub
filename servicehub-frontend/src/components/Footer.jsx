@@ -56,6 +56,10 @@ const Footer = () => {
           <a href="#" className="hover:text-white">Privacy Policy</a>
           <a href="#" className="hover:text-white">Terms of Service</a>
           <a href="#" className="hover:text-white">Cookie Policy</a>
+           <a href="#" className="hover:text-white">Privacy Policy</a>
+          <a href="#" className="hover:text-white">Terms of Service</a>
+          <a href="#" className="hover:text-white">Cookie Policy</a>
+        
         </div>
       </div>
     </footer>
