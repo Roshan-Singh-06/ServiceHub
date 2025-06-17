@@ -1,10 +1,26 @@
 import { FaShoppingCart, FaMapMarkerAlt } from "react-icons/fa";
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../api/axiosInstance';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const handleLogout = async () => {
+    setLoading(true);
+    try {
+      await axiosInstance.post('/auth/logout');
+      localStorage.removeItem('accessToken');
+      alert('Logout successful!');
+      navigate('/login');
+    } catch (err) {
+      alert('Logout failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 bg-white shadow-md px-4 md:px-10 py-3 md:py-4">
@@ -40,7 +56,9 @@ export default function Navbar() {
               <span className="text-sm md:text-base">Cart</span>
             </div>
             <button className="bg-[#5c7c89] text-white px-4 py-1 rounded-md hover:bg-[#4e6a78] text-sm md:text-base" onClick={() => navigate('/login')}>Login</button>
-            <button className="bg-black text-white px-4 py-1 rounded-md hover:bg-gray-900 text-sm md:text-base">Sign Up</button>
+            <button className="bg-black text-white px-4 py-1 rounded-md hover:bg-gray-900 text-sm md:text-base" onClick={handleLogout} disabled={loading}>
+              {loading ? 'Logging out...' : 'Logout'}
+            </button>
           </div>
         </div>
       </div>
@@ -60,7 +78,9 @@ export default function Navbar() {
             <span className="text-sm">Cart</span>
           </div>
           <button className="bg-[#5c7c89] text-white px-4 py-1 rounded-md hover:bg-[#4e6a78] text-sm w-full md:w-auto" onClick={() => { setMenuOpen(false); navigate('/login'); }}>Login</button>
-          <button className="bg-black text-white px-4 py-1 rounded-md hover:bg-gray-900 text-sm w-full">Sign Up</button>
+          <button className="bg-black text-white px-4 py-1 rounded-md hover:bg-gray-900 text-sm w-full" onClick={handleLogout} disabled={loading}>
+            {loading ? 'Logging out...' : 'Logout'}
+          </button>
         </div>
       )}
     </nav>

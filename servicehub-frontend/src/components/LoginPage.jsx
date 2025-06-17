@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import axios from 'axios';
+import axiosInstance from '../api/axiosInstance';
+import Loader from './Loader';
 
 const brandAccent = '#5c7c89';
 const brandAccentHover = '#4e6a78';
@@ -13,6 +14,7 @@ export default function LoginPage() {
   const [form, setForm] = useState(initialForm);
   const [message, setMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -22,19 +24,20 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage('');
+    setLoading(true);
     try {
       if (isLogin) {
         // Login: only send email and password
-        const res = await axios.post('http://localhost:5000/api/auth/login', {
+        const res = await axiosInstance.post('/auth/login', {
           email: form.email,
           password: form.password,
         });
         setMessage('Login successful!');
-        localStorage.setItem('accessToken', res.data.data.accessToken);
+        localStorage.setItem('accessToken', res.data.data?.accessToken);
         setTimeout(() => navigate('/'), 1000);
       } else {
         // Register: send all fields
-        const res = await axios.post('http://localhost:5000/api/auth/register', {
+        const res = await axiosInstance.post('/auth/register', {
           username: form.username,
           name: form.name,
           email: form.email,
@@ -50,6 +53,8 @@ export default function LoginPage() {
         err.response?.data?.error ||
         'Something went wrong. Please try again.'
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,6 +63,8 @@ export default function LoginPage() {
     setMessage('');
     setForm(initialForm);
   };
+
+  if (loading) return <Loader />;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#1f4959] via-[#5c7c89] to-[#1f4959] px-4">
@@ -125,7 +132,7 @@ export default function LoginPage() {
             type="submit"
             className="w-full bg-[#5c7c89] hover:bg-[#4e6a78] text-white font-semibold py-2 rounded-md transition duration-300 shadow-md"
           >
-            {isLogin ? 'Login' : 'Create Account'}
+            {loading ? <Loader size={20} color="white" /> : isLogin ? 'Login' : 'Create Account'}
           </button>
         </form>
         {message && (
