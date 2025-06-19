@@ -6,5 +6,6 @@ const router = express.Router();
 router.get('/states', locationController.getStates);
 router.get('/districts', locationController.getDistricts);
 router.get('/cities', locationController.getCities);
+router.post('/check-service', locationController.checkServiceAvailability);
 
 export default router;

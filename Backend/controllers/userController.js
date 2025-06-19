@@ -121,20 +121,17 @@ export const sendEmailOTP = asyncHandler(async (req, res, next) => {
   if (!email) {
     throw new ApiError(400, 'Email is required');
   }
+  // Only allow OTP for existing users
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new ApiError(404, 'User not found. Please register first.');
+  }
   // Generate OTP and expiry (10 min)
   const otp = generateOTP();
   const otpExpiry = Date.now() + 10 * 60 * 1000;
-
-  // Optionally: Save OTP and expiry to user or a temp collection
-  // Here, for demo, attach to user if exists
-  let user = await User.findOne({ email });
-  if (!user) {
-    user = await User.create({ email }); // or throw error if you want only for registered users
-  }
   user.emailOTP = otp;
   user.emailOTPExpiry = otpExpiry;
   await user.save();
-
   await sendOTPEmail({ to: email, otp });
   res.status(200).json(new ApiResponse(200, null, 'OTP sent to email'));
 });
@@ -145,14 +142,19 @@ export const verifyEmailOTP = asyncHandler(async (req, res, next) => {
   if (!email || !otp) {
     throw new ApiError(400, 'Email and OTP are required');
   }
-  const user = await User.findOne({ email });
+  // Explicitly select OTP fields
+  const user = await User.findOne({ email }).select('+emailOTP +emailOTPExpiry');
+  console.log('OTP verification - user:', user);
   if (!user || !user.emailOTP || !user.emailOTPExpiry) {
+    console.error('No OTP found for this email:', email, user);
     throw new ApiError(400, 'No OTP found for this email');
   }
   if (user.emailOTP !== otp) {
+    console.error('Invalid OTP for email:', email, 'Expected:', user.emailOTP, 'Received:', otp);
     throw new ApiError(400, 'Invalid OTP');
   }
   if (user.emailOTPExpiry < Date.now()) {
+    console.error('OTP expired for email:', email);
     throw new ApiError(400, 'OTP expired');
   }
   user.emailVerified = true;

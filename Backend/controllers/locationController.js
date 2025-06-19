@@ -60,10 +60,30 @@ const getCities = async (req, res) => {
   }
 };
 
+// Service availability check for a state
+const checkServiceAvailability = (req, res) => {
+  const { stateName } = req.body;
+  if (!stateName) {
+    return res.status(400).json({ message: 'State name is required' });
+  }
+  if (stateName.trim().toLowerCase() === 'maharashtra') {
+    return res.status(200).json({
+      available: true,
+      message: 'Yes, ServiceHub provides service in your state.'
+    });
+  } else {
+    return res.status(200).json({
+      available: false,
+      message: 'Sorry, ServiceHub does not provide service in your state.'
+    });
+  }
+};
+
 // Export all controllers (ESM way)
 export default {
   getStates,
   getDistricts,
-  getCities
+  getCities,
+  checkServiceAvailability
 };
 

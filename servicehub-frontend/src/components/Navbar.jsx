@@ -1,12 +1,23 @@
 import { FaShoppingCart, FaMapMarkerAlt } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
+import LocationModal from './LocationModal';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(() => localStorage.getItem('selectedState') || '');
+  const [locationModalOpen, setLocationModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setSelectedLocation(localStorage.getItem('selectedState') || '');
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   const handleLogout = async () => {
     setLoading(true);
@@ -47,9 +58,11 @@ export default function Navbar() {
           {/* Right options */}
           <div className="flex flex-row space-x-4 items-center">
             {/* Location selector */}
-            <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer" onClick={() => navigate('/location')}>
+            <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer" onClick={() => setLocationModalOpen(true)}>
               <FaMapMarkerAlt className="text-lg" />
-              <span className="text-sm md:text-base">Select Location</span>
+              <span className="text-sm md:text-base">
+                {selectedLocation ? selectedLocation : 'Select Location'}
+              </span>
             </div>
             <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer">
               <FaShoppingCart className="text-lg" />
@@ -69,7 +82,7 @@ export default function Navbar() {
           <button type="button" onClick={() => scrollToSection('how-it-works', setMenuOpen)} className="text-[#242424] hover:text-black text-base bg-transparent w-full text-left">How It Works</button>
           <a href="/about" className="text-[#242424] hover:text-black text-base">About</a>
           {/* Location selector for mobile */}
-          <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer" onClick={() => { setMenuOpen(false); navigate('/location'); }}>
+          <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer" onClick={() => { setMenuOpen(false); setLocationModalOpen(true); }}>
             <FaMapMarkerAlt className="text-lg" />
             <span className="text-sm">Select Location</span>
           </div>
@@ -83,6 +96,18 @@ export default function Navbar() {
           </button>
         </div>
       )}
+      <LocationModal
+        isOpen={locationModalOpen}
+        onClose={() => setLocationModalOpen(false)}
+        onLocationSaved={(stateName, goToServices) => {
+          setSelectedLocation(stateName);
+          if (goToServices) {
+            window.location.hash = '#services';
+          } else {
+            window.location.hash = '';
+          }
+        }}
+      />
     </nav>
   );
 }

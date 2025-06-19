@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
 
-console.log('EMAIL_USER:', process.env.EMAIL_USER);
-console.log('EMAIL_PASS:', process.env.EMAIL_PASS ? '***' : 'MISSING');
+dotenv.config();
+
 
 export function generateOTP(length = 6) {
   return Math.floor(Math.pow(10, length - 1) + Math.random() * 9 * Math.pow(10, length - 1)).toString();
