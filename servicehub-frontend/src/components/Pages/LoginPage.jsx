@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import axiosInstance from '../api/axiosInstance';
-import Loader from './Loader';
+import axiosInstance from '../../api/axiosInstance';
+import Loader from '../Loader';
 
 const brandAccent = '#5c7c89';
 const brandAccentHover = '#4e6a78';

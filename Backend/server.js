@@ -6,6 +6,7 @@ import ApiError from './utils/ApiError.js';
 import ApiResponse from './utils/ApiResponse.js';
 import authRoutes from './routes/auth.js';
 import locationRoutes from './routes/location.js';
+import serviceRoutes from './routes/service.js';
 import cookieParser from 'cookie-parser';
 
 // Load environment variables
@@ -18,10 +19,16 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 // Middleware
-app.use(cors({
-  origin: 'http://localhost:5173', // Frontend origin
-  credentials: true
-}));
+// Middleware
+  cors({
+    origin:
+      process.env.NODE_ENV === "production"
+        ? "https://admin-panel-1-rele.onrender.com"
+        : ["http://localhost:5173", "http://localhost:5174"],
+    credentials: true,
+  })
+
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -29,6 +36,7 @@ app.use(cookieParser());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/location', locationRoutes);
+app.use('/api/service', serviceRoutes);
 
 // 404 Route Not Found handler
 app.use((req, res, next) => {

@@ -8,7 +8,7 @@ import { generateOTP, sendOTPEmail } from '../utils/emailUtils.js';
 // Register a new user
 export const registerUser = asyncHandler(async (req, res, next) => {
   try { 
-    const { username, name, email, password } = req.body;
+    const { username, name, email, password, role } = req.body;
 
   if (!username || !name || !email || !password) {
     throw new ApiError(400, 'All fields are required');
@@ -22,7 +22,8 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     username,
     name,
     email,
-    password
+    password,
+    role: role || 'user',
   });
 
   const userObj = user.toObject();
@@ -68,6 +69,9 @@ export const loginUser = asyncHandler(async (req, res, next) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
   
+    // Extra debug: print user role and emailVerified
+    console.log('User role:', user.role, 'Email verified:', user.emailVerified);
+
     generateToken(res, user._id); 
     res.status(200).json({ success: true, message: 'Login successful' });
   } catch (err) {

@@ -2,7 +2,7 @@ import { FaShoppingCart, FaMapMarkerAlt } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
-import LocationModal from './LocationModal';
+import LocationModal from './Pages/LocationModal';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);

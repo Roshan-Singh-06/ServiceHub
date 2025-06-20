@@ -1,7 +1,6 @@
 import express from 'express';
 import { registerUser, loginUser, updateUserLocation, logoutUser, sendEmailOTP, verifyEmailOTP } from '../controllers/userController.js';
-import { authMiddleware } from '../middleware/authMiddleware.js';
-// import { authMiddleware } from '../middleware/authMiddleware.js';
+import { authenticate } from '../middleware/authMiddleware.js';
 
 
 const router = express.Router();
@@ -13,8 +12,8 @@ router.get('/test', (req, res) => {
 });
 
 router.post('/register', registerUser);
-router.post('/login',authMiddleware,loginUser);
-router.post('/logout', authMiddleware,logoutUser);
+router.post('/login', authenticate, loginUser);
+router.post('/logout', authenticate, logoutUser);
 router.post('/location', updateUserLocation);
 router.post('/send-otp', sendEmailOTP);
 router.post('/verify-otp', verifyEmailOTP);
