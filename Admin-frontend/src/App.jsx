@@ -14,7 +14,9 @@ import Messages from "./pages/Messages";
 import Bookings from "./pages/Bookings";
 import CreateAdmin from "./pages/CreateAdmin";
 import ProtectedRoute from "./components/ProtectedRoute";
-import EditProduct from "./pages/EditProduct";
+import EditService from "./pages/EditService";
+import AddSubService from "./pages/AddSubService";
+import SubServiceList from "./pages/SubServiceList";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -64,7 +66,9 @@ function App() {
                   <Route path="/messages" element={<Messages />} />
                   <Route path="/Bookings" element={<Bookings />} />
                   <Route path="/create-admin" element={<CreateAdmin />} />
-                  <Route path="/edit-product/:id" element={<EditProduct />} />
+                  <Route path="/edit-service/:id" element={<EditService />} />
+                  <Route path="/add-subservice/:serviceId" element={<AddSubService />} />
+                  <Route path="/subservices/:serviceId" element={<SubServiceList />} />
                 </Route>
               </Routes>
             </Router>

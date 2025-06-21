@@ -1,47 +1,36 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getProducts, deleteProduct } from "../services/api";
+import { getServices, deleteService } from "../services/api";
 import toast from "react-hot-toast";
 
-const ProductList = () => {
-  const [products, setProducts] = useState([]);
+const ServicesList = () => {
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [pages, setPages] = useState(1);
-  const [keyword, setKeyword] = useState("");
 
   useEffect(() => {
-    fetchProducts();
-  }, [page, keyword]);
+    fetchServices();
+  }, []);
 
-  const fetchProducts = async () => {
+  const fetchServices = async () => {
     try {
-      const { data } = await getProducts(page, keyword);
-      setProducts(data.products);
-      setPages(data.pages);
+      const { data } = await getServices();
+      setServices(data.data || []);
     } catch (error) {
-      toast.error("Failed to fetch products");
+      toast.error("Failed to fetch services");
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this product?")) {
-      try {
-        await deleteProduct(id);
-        toast.success("Product deleted successfully");
-        fetchProducts();
-      } catch (error) {
-        toast.error("Failed to delete product");
-      }
+    if (!window.confirm("Are you sure you want to delete this service?")) return;
+    try {
+      await deleteService(id);
+      setServices((prev) => prev.filter((s) => s._id !== id));
+      toast.success("Service deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete service");
     }
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setKeyword(e.target.value);
-    setPage(1);
   };
 
   if (loading) {
@@ -50,126 +39,104 @@ const ProductList = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6 dark:text-white">
-        <h1 className="text-2xl font-bold">Products</h1>
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
+        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
+          Service Management
+        </h1>
         <Link
-          to="/add-product"
-          className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+          to="/add-services" 
+          className="inline-block bg-[#5c7c89] hover:bg-[#1f4959] text-white px-4 py-1 rounded mr-2 font-semibold transition-colors duration-200"
         >
-          Add New Product
+          + Add New Service
         </Link>
       </div>
-
-      {/* Search Bar */}
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search products..."
-          value={keyword}
-          onChange={handleSearch}
-          className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-white"
-        />
-      </div>
-
-      {/* Products Table */}
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="overflow-x-auto bg-white dark:bg-gray-800 shadow-lg rounded-lg">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-100 dark:bg-gray-700">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                 Image
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                 Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Category
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                Description
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Price/kg
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                Price
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Stock(Kg)
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-center text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {products.map((product) => (
-              <tr key={product._id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">{product.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {product.category}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  ₹{product.price}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">{product.stock}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      product.isActive
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {product.isActive ? "Active" : "Inactive"}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <Link
-                    to={`/edit-product/${product._id}`}
-                    className="text-indigo-600 hover:text-indigo-900 mr-3"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => handleDelete(product._id)}
-                    className="text-red-600 hover:text-red-900"
-                  >
-                    Delete
-                  </button>
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            {services.length === 0 ? (
+              <tr>
+                <td
+                  colSpan="5"
+                  className="text-center py-8 text-gray-500 dark:text-gray-400"
+                >
+                  No services found.
                 </td>
               </tr>
-            ))}
+            ) : (
+              services.map((service) => (
+                <tr
+                  key={service._id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <img
+                      src={service.image}
+                      alt={service.serviceName}
+                      className="h-14 w-14 rounded-lg object-cover border border-gray-200 dark:border-gray-700 shadow"
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-800 dark:text-white">
+                    {service.serviceName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-gray-600 dark:text-gray-300 max-w-xs truncate">
+                    {service.description}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-[#1f4959] dark:text-blue-300 font-bold">
+                    ₹{service.price}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <Link
+                      to={`/edit-service/${service._id}`}
+                      className="inline-block bg-[#5c7c89] hover:bg-[#1f4959] text-white px-4 py-1 rounded mr-2 font-semibold transition-colors duration-200"
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      onClick={() => handleDelete(service._id)}
+                      className="inline-block bg-red-500 hover:bg-red-700 text-white px-4 py-1 rounded font-semibold transition-colors duration-200"
+                    >
+                      Delete
+                    </button>
+                    <Link
+                      to={`/add-subservice/${service._id}`}
+                      className="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded font-semibold transition-colors duration-200 ml-2"
+                    >
+                      Add SubService
+                    </Link>
+                    <Link
+                      to={`/subservices/${service._id}`}
+                      className="inline-block bg-blue-500 hover:bg-blue-700 text-white px-4 py-1 rounded font-semibold transition-colors duration-200 ml-2"
+                    >
+                      View SubServices
+                    </Link>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
-
-      {/* Pagination */}
-      {pages > 1 && (
-        <div className="mt-4 flex justify-center">
-          <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-            {[...Array(pages)].map((_, index) => (
-              <button
-                key={index + 1}
-                onClick={() => setPage(index + 1)}
-                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                  page === index + 1
-                    ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
-                    : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
-          </nav>
-        </div>
-      )}
     </div>
   );
 };
 
-export default ProductList;
+export default ServicesList;

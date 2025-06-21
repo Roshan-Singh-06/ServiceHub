@@ -23,50 +23,24 @@ export const getUserById = (id) => api.get(`/users/${id}`);
 export const updateUser = (id, userData) => api.patch(`/users/${id}`, userData);
 export const deleteUser = (id) => api.delete(`/users/${id}`);
 
-// Product APIs
-export const getProducts = (page = 1, keyword = "") =>
-  api.get(`/products?page=${page}&keyword=${keyword}`);
-export const getProductById = (id) => api.get(`/products/${id}`);
-export const createProduct = (productData) => {
-  const formData = new FormData();
-  Object.keys(productData).forEach((key) => {
-    if (key === "image01") {
-      formData.append("image01", productData[key]);
-    } else if (key === "image02") {
-      formData.append("image02", productData[key]);
-    } else if (key === "image03") {
-      formData.append("image03", productData[key]);
-    } else {
-      formData.append(key, productData[key]);
-    }
+// Service APIs
+export const createService = (formData) =>
+  api.post("/service", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
   });
-  return api.post("/products", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-};
-export const updateProduct = (id, productData) => {
-  const formData = new FormData();
-  Object.keys(productData).forEach((key) => {
-    if (key === "image01" && productData[key]) {
-      formData.append("image01", productData[key]);
-    } else if (key === "image02" && productData[key]) {
-      formData.append("image02", productData[key]);
-    } else if (key === "image03" && productData[key]) {
-      formData.append("image03", productData[key]);
-    } else {
-      formData.append(key, productData[key]);
-    }
-  });
-  return api.put(`/products/${id}`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-};
-export const deleteProduct = (id) => api.delete(`/products/${id}`);
 
+export const getServices = () => api.get("/service");
+export const getServiceById = (id) => api.get(`/service/${id}`);
+
+export const updateService = (id, formData) =>
+  api.patch(`/service/${id}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+export const deleteService = (id) => api.delete(`/service/${id}`);
+export const createSubService = (formData) =>
+  api.post("/subservice", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
 // Order APIs
 export const getOrders = () => api.get("/orders");
 export const getOrderById = (id) => api.get(`/orders/${id}`);
@@ -101,12 +75,5 @@ export const getUnreadCount = () => api.get("/messages/unread/count");
 
 export const creatadmin = (adminData) => api.post("/users", adminData);
 export const getsummary = (name, price, dimension, category) => api.post("/gemini/createsummary",{name, price, dimension, category})
-// Service APIs
-export const createService = async (formData) => {
-  // formData should be a FormData object
-  return api.post('/service', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
-};
 
 export default api;

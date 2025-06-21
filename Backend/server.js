@@ -8,7 +8,8 @@ import authRoutes from './routes/auth.js';
 import locationRoutes from './routes/location.js';
 import serviceRoutes from './routes/service.js';
 import cookieParser from 'cookie-parser';
-
+import userRoutes from './routes/user.js';
+import subServiceRoutes from './routes/subService.js'; // Import subServiceRoutes
 // Load environment variables
 dotenv.config();
 // Initialize Express app
@@ -19,7 +20,7 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 // Middleware
-// Middleware
+app.use(
   cors({
     origin:
       process.env.NODE_ENV === "production"
@@ -27,16 +28,17 @@ connectDB();
         : ["http://localhost:5173", "http://localhost:5174"],
     credentials: true,
   })
-
+);
 
 app.use(express.json());
 app.use(cookieParser());
-
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/location', locationRoutes);
 app.use('/api/service', serviceRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/subService', subServiceRoutes); // Register subService routes
 
 // 404 Route Not Found handler
 app.use((req, res, next) => {

@@ -167,3 +167,30 @@ export const verifyEmailOTP = asyncHandler(async (req, res, next) => {
   await user.save();
   res.status(200).json(new ApiResponse(200, null, 'Email verified successfully'));
 });
+
+// Get all users (admin only)
+export const getUsers = asyncHandler(async (req, res) => {
+  const users = await User.find().select('-password');
+  res.status(200).json(new ApiResponse(200, users, 'All users fetched successfully'));
+});
+
+// Get a single user by ID (admin only)
+export const getUserById = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id).select('-password');
+  if (!user) throw new ApiError(404, 'User not found');
+  res.status(200).json(new ApiResponse(200, user, 'User fetched successfully'));
+});
+
+// Update a user by ID (admin only)
+export const updateUser = asyncHandler(async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true }).select('-password');
+  if (!user) throw new ApiError(404, 'User not found');
+  res.status(200).json(new ApiResponse(200, user, 'User updated successfully'));
+});
+
+// Delete a user by ID (admin only)
+export const deleteUser = asyncHandler(async (req, res) => {
+  const user = await User.findByIdAndDelete(req.params.id);
+  if (!user) throw new ApiError(404, 'User not found');
+  res.status(200).json(new ApiResponse(200, null, 'User deleted successfully'));
+});

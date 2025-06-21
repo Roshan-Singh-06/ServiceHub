@@ -14,8 +14,13 @@ const Users = () => {
   const fetchUsers = async () => {
     try {
       const { data } = await getUsers();
-      setUsers(data);
+      // Show all users except those with role 'admin'
+      const filtered = (data.data || data).filter(
+        (user) => user.role !== "admin"
+      );
+      setUsers(filtered);
     } catch (error) {
+      console.error("Fetch users error:", error);
       toast.error("Failed to fetch users");
     } finally {
       setLoading(false);

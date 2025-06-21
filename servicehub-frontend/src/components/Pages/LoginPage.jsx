@@ -139,18 +139,52 @@ export default function LoginPage() {
                 required
                 maxLength={50}
               />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={form.email}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-[#5c7c89]"
+                required
+              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  placeholder="Password"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-[#5c7c89] pr-10"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 focus:outline-none"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  tabIndex={-1}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </>
           )}
           {/* Login/OTP fields */}
-          <input
-            type="email"
-            name="email"
-            placeholder="Email Address"
-            value={form.email}
-            onChange={handleChange}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5c7c89] bg-[#f9fbfc] text-lg shadow-sm"
-            required
-          />
+          {isLogin && (
+            <>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={form.email}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5c7c89] bg-[#f9fbfc] text-lg shadow-sm"
+                required
+              />
+            </>
+          )}
           {/* Send OTP button after email input in OTP session */}
           {showOTP && !otpSent && (
             <button

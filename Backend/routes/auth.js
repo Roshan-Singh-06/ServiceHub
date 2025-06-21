@@ -10,10 +10,12 @@ router.get('/test', (req, res) => {
   console.log('Test route hit');
   res.send('Test route working');
 });
-
+router.get('/me', async (req, res) => {
+  res.json({ user: req.user });
+});
 router.post('/register', registerUser);
-router.post('/login', authenticate, loginUser);
-router.post('/logout', authenticate, logoutUser);
+router.post('/login', loginUser);
+router.post('/logout',  logoutUser);
 router.post('/location', updateUserLocation);
 router.post('/send-otp', sendEmailOTP);
 router.post('/verify-otp', verifyEmailOTP);
