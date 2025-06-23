@@ -15,7 +15,7 @@ router.get('/', getServices);
 router.get('/:id', getServiceById);
 
 // Update a service (admin only)
-router.put('/:id', authenticate, authorizeAdmin, updateService);
+router.put('/:id', authenticate, authorizeAdmin, upload.single('image'), updateService);
 
 // Delete a service (admin only)
 router.delete('/:id', authenticate, authorizeAdmin, deleteService);

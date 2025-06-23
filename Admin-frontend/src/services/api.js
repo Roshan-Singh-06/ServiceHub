@@ -33,47 +33,14 @@ export const getServices = () => api.get("/service");
 export const getServiceById = (id) => api.get(`/service/${id}`);
 
 export const updateService = (id, formData) =>
-  api.patch(`/service/${id}`, formData, {
+  api.put(`/service/${id}`, formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 export const deleteService = (id) => api.delete(`/service/${id}`);
 export const createSubService = (formData) =>
-  api.post("/subservice", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-// Order APIs
-export const getOrders = () => api.get("/orders");
-export const getOrderById = (id) => api.get(`/orders/${id}`);
-export const updateOrderStatus = (id, status) =>
-  api.put(`/orders/${id}/status`, { status });
-export const updateOrderToDelivered = (id) => api.put(`/orders/${id}/deliver`);
-
-// Message APIs
-export const getMessages = () => api.get("/messages");
-export const getMessageById = (id) => api.get(`/messages/${id}`);
-export const createMessage = (messageData) => {
-  const formData = new FormData();
-  Object.keys(messageData).forEach((key) => {
-    if (key === "attachments") {
-      messageData[key].forEach((file) => {
-        formData.append("attachments", file);
-      });
-    } else {
-      formData.append(key, messageData[key]);
-    }
-  });
-  return api.post("/messages", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-};
-export const updateMessage = (id, messageData) =>
-  api.put(`/messages/${id}`, messageData);
-export const deleteMessage = (id) => api.delete(`/messages/${id}`);
-export const getUnreadCount = () => api.get("/messages/unread/count");
+  api.post("/subservice", formData); // Let axios send as JSON
 
 export const creatadmin = (adminData) => api.post("/users", adminData);
-export const getsummary = (name, price, dimension, category) => api.post("/gemini/createsummary",{name, price, dimension, category})
+export const getsummary = (name, price, dimension, category) => api.post("/gemini/createsummary",{name, price, dimension, category});
 
 export default api;

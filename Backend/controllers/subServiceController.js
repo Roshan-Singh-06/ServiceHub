@@ -5,18 +5,22 @@ import asyncHandler from '../utils/asyncHandler.js';
 
 // Create a new subservice
 export const createSubService = asyncHandler(async (req, res) => {
-  const { service, category, image } = req.body;
-  if (!service || !category || !image) {
-    throw new ApiError(400, 'Service, category, and image are required');
+  const { service, category, icon } = req.body;
+  // Debug logging for incoming data
+  console.log('createSubService called with:', { service, category, icon });
+  if (!service || !category || !icon) {
+    console.error('Missing required fields:', { service, category, icon });
+    throw new ApiError(400, 'Service, category, and icon are required');
   }
   // Validate category for service
   if (!subServiceCategory[service] || !subServiceCategory[service].includes(category)) {
+    console.error('Invalid category for service:', { service, category, subServiceCategory });
     throw new ApiError(400, 'Invalid category for selected service');
   }
   const subService = new SubService({
     service,
     category,
-    image,
+    icon,
   });
   await subService.save();
   res.status(201).json(new ApiResponse(201, subService, 'SubService created successfully'));
@@ -42,11 +46,18 @@ export const getAllSubServices = asyncHandler(async (req, res) => {
 // Update a subservice
 export const updateSubService = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { service, category, image } = req.body;
+  const { service, category, icon } = req.body;
+
+  // Only update provided fields
+  const updateFields = {};
+  if (service) updateFields.service = service;
+  if (category) updateFields.category = category;
+  if (icon) updateFields.icon = icon;
+
   const subService = await SubService.findByIdAndUpdate(
     id,
-    { service, category, image },
-    { new: true }
+    updateFields,
+    { new: true, runValidators: true }
   );
   if (!subService) throw new ApiError(404, 'SubService not found');
   res.json(new ApiResponse(200, subService, 'SubService updated successfully'));

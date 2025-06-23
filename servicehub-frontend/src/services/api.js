@@ -11,3 +11,4 @@ const api = axios.create({
 });
 
 export const getServices = () => api.get("/service");
+export default api;

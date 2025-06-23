@@ -31,16 +31,14 @@ const subServiceCategory = {
     'Manicure & Pedicure',
   ],
   'Plumbing Services': [
-    'Pipe Repair',
-    'Leak Fix',
-    'Tap Installation',
-    'Drainage Cleaning',
-    'Bathroom Fitting',
-    'Water Tank Cleaning',
-    'Geyser Installation',
-    'Toilet Repair',
-    'Sewer Line Cleaning',
-    'Kitchen Sink Repair',
+    'Bath fittings',
+    'Basin & sink',
+    'Grouting',
+    'Water filter',
+    'Drainage',
+    'Toilet',
+    'Tap & mixer',
+    'Water tank',
   ],
   'Painting Services': [
     'Interior Painting',
@@ -115,12 +113,17 @@ const subServiceSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: function (v) {
+        // Robust validation: check if service and category list exist
+        if (!this.service || !subServiceCategory[this.service]) {
+          // Option 1: skip validation if service is missing or invalid
+          return true;
+        }
         return subServiceCategory[this.service].includes(v);
       },
       message: props => `${props.value} is not a valid category for ${props.instance.service}`,
     },
   },
-  image: {
+  icon: {
     type: String,
     required: true,
   },

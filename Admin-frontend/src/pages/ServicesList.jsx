@@ -1,15 +1,24 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { getServices, deleteService } from "../services/api";
 import toast from "react-hot-toast";
 
 const ServicesList = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchServices();
-  }, []);
+    if (location.state && location.state.updated) {
+      fetchServices();
+      // Clear the state robustly
+      navigate(location.pathname, { replace: true });
+    } else {
+      fetchServices();
+    }
+    // eslint-disable-next-line
+  }, [location.pathname, location.state]);
 
   const fetchServices = async () => {
     try {
@@ -33,6 +42,12 @@ const ServicesList = () => {
     }
   };
 
+  const handleUpdateInPlace = (updatedService) => {
+    setServices((prev) =>
+      prev.map((s) => (s._id === updatedService._id ? updatedService : s))
+    );
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -44,7 +59,7 @@ const ServicesList = () => {
           Service Management
         </h1>
         <Link
-          to="/add-services" 
+          to="/add-services"
           className="inline-block bg-[#5c7c89] hover:bg-[#1f4959] text-white px-4 py-1 rounded mr-2 font-semibold transition-colors duration-200"
         >
           + Add New Service

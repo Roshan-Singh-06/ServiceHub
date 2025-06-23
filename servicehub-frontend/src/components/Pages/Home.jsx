@@ -11,9 +11,10 @@ export default function Home() {
   return (
     <div>
       <HeroSection />
-      <StatsBanner />
+      
       <ServiceHubHome />
       <Services />
+      <StatsBanner />
       <FeaturedProfessionals />
       <HowItWorks />
       <ReadyToBook />

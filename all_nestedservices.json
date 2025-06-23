@@ -1,0 +1,26 @@
+﻿
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : {"statusCode":200,"data":[{"_id":"685922910d2af6d48993a0d3","subservice":"Sofa 
+                    Cleaning","name":"Recliner Cleaning","price":200,"time":"40mins","desc":"i will the clean 
+                    it","createdAt":"2025-06-23T09:...
+RawContent        : HTTP/1.1 200 OK
+                    Vary: Origin
+                    Access-Control-Allow-Credentials: true
+                    Connection: keep-alive
+                    Keep-Alive: timeout=5
+                    Content-Length: 3076
+                    Content-Type: application/json; charset=utf-8
+                    Date: Mon, 23...
+Forms             : {}
+Headers           : {[Vary, Origin], [Access-Control-Allow-Credentials, true], [Connection, keep-alive], [Keep-Alive, 
+                    timeout=5]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 3076
+
+
+

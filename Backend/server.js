@@ -10,10 +10,15 @@ import serviceRoutes from './routes/service.js';
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/user.js';
 import subServiceRoutes from './routes/subService.js'; // Import subServiceRoutes
+import nestedServiceRoutes from './routes/nestedService.js';
+import path from 'path';
+
 // Load environment variables
 dotenv.config();
 // Initialize Express app
 const app = express();
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 5000;
 
 // Connect to MongoDB
@@ -30,8 +35,12 @@ app.use(
   })
 );
 
-app.use(express.json());
+
 app.use(cookieParser());
+
+// Helper: Log static file serving for debug
+console.log('Serving static files from:', path.resolve('uploads'));
+app.use('/uploads', express.static('uploads'));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -39,6 +48,13 @@ app.use('/api/location', locationRoutes);
 app.use('/api/service', serviceRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/subService', subServiceRoutes); // Register subService routes
+app.use('/api/nestedservice', nestedServiceRoutes);
+
+
+app.use((req, res, next) => {
+  console.log('404 Debug:', req.method, req.originalUrl);
+  next(new ApiError(404, 'Route not found'));
+});
 
 // 404 Route Not Found handler
 app.use((req, res, next) => {

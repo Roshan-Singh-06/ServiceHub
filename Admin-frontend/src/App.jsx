@@ -17,6 +17,10 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import EditService from "./pages/EditService";
 import AddSubService from "./pages/AddSubService";
 import SubServiceList from "./pages/SubServiceList";
+import EditSubService from "./pages/EditSubService";
+import AddNestedService from "./pages/AddNestedService";
+import EditNestedService from "./pages/EditNestedService";
+import NestedServiceList from "./pages/NestedServiceList";
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -69,6 +73,10 @@ function App() {
                   <Route path="/edit-service/:id" element={<EditService />} />
                   <Route path="/add-subservice/:serviceId" element={<AddSubService />} />
                   <Route path="/subservices/:serviceId" element={<SubServiceList />} />
+                  <Route path="/edit-subservice/:id" element={<EditSubService />} />
+                  <Route path="/add-nestedservice" element={<AddNestedService />} />
+                  <Route path="/edit-nestedservice/:id" element={<EditNestedService />} />
+                  <Route path="/nestedservices" element={<NestedServiceList />} />
                 </Route>
               </Routes>
             </Router>

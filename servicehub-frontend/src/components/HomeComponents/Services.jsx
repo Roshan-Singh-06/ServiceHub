@@ -41,9 +41,9 @@ const Services = () => {
             <div
               key={service._id || index}
               onClick={() => {
-                if (service.serviceName === 'Plumbing Services') navigate('/plumber');
+                navigate(`/subservices/${service.serviceName}`);
               }}
-              style={{ cursor: service.serviceName === 'Plumbing Services' ? 'pointer' : 'default' }}
+              style={{ cursor: 'pointer' }}
             >
               <ServiceCard
                 title={service.serviceName}

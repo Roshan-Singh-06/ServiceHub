@@ -7,8 +7,9 @@ import LoginPage from './components/Pages/LoginPage.jsx';
 import About from './components/Pages/About.jsx';
 import CheckoutPage from './components/Pages/CheckoutPage.jsx'
 
-import PlumberSection from './components/Pages/PlumberSection.jsx';
+import PlumberSection from './components/Pages/SubService.jsx';
 import WomenSalon from './components/Pages/WomenSalon.jsx';
+import SubServiceList from './components/Pages/SubService.jsx';
 
 export default function App() {
   return (
@@ -30,8 +31,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage/>} />
           <Route path="/about" element={<About />} />
           <Route path="/checkout" element={<CheckoutPage />} />
-          
-         
+          <Route path="/subservices/:serviceName" element={<SubServiceList />} />
         </Routes>
       </Router>
     </ErrorBoundary>

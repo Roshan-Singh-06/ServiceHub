@@ -9,10 +9,9 @@ const AddSubService = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     category: "",
-    image: null,
+    icon: "",
   });
   const [loading, setLoading] = useState(false);
-  const [preview, setPreview] = useState("");
   const [serviceName, setServiceName] = useState("");
   const [categoryOptions, setCategoryOptions] = useState([]);
 
@@ -24,13 +23,14 @@ const AddSubService = () => {
         // Fetch subservice categories for this service
         if (data.data?.serviceName) {
           const res = await getSubServiceCategories(data.data.serviceName);
-          console.log("Fetched categories for", data.data.serviceName, res.data); // DEBUG
           setCategoryOptions(res.data.categories || []);
+          if (!res.data.categories || res.data.categories.length === 0) {
+            toast.error("No categories found for this service. Check service name in backend model.");
+          }
         } else {
           setCategoryOptions([]);
         }
       } catch (err) {
-        console.error("Error fetching service or categories", err); // DEBUG
         setServiceName("");
         setCategoryOptions([]);
       }
@@ -43,23 +43,26 @@ const AddSubService = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData((prev) => ({ ...prev, image: file }));
-      setPreview(URL.createObjectURL(file));
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const data = new FormData();
-      data.append("service", serviceId);
-      data.append("category", formData.category);
-      if (formData.image) data.append("image", formData.image);
-      await createSubService(data);
+      // Debug: log what is being sent
+      console.log({
+        service: serviceName,
+        category: formData.category,
+        icon: formData.icon,
+      });
+      if (!serviceName || !formData.category || !formData.icon) {
+        toast.error("All fields are required.");
+        setLoading(false);
+        return;
+      }
+      await createSubService({
+        service: serviceName,
+        category: formData.category,
+        icon: formData.icon,
+      });
       toast.success("SubService added successfully!");
       navigate("/services");
     } catch (error) {
@@ -105,21 +108,18 @@ const AddSubService = () => {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Image</label>
+          <label className="block text-sm font-medium mb-1">Icon</label>
           <input
-            type="file"
-            name="image"
-            accept="image/*"
+            type="text"
+            name="icon"
             required
-            onChange={handleImageChange}
+            value={formData.icon}
+            onChange={handleChange}
+            placeholder="e.g. 🚿 or fa-solid fa-wrench"
             className="w-full px-4 py-2 border rounded-md"
           />
-          {preview && (
-            <img
-              src={preview}
-              alt="Preview"
-              className="w-24 h-24 object-cover rounded mt-2"
-            />
+          {formData.icon && (
+            <span className="text-3xl mt-2 inline-block">{formData.icon}</span>
           )}
         </div>
         <button

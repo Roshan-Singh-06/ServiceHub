@@ -58,9 +58,13 @@ const EditService = () => {
       data.append("description", formData.description);
       data.append("price", formData.price);
       if (formData.image) data.append("image", formData.image);
+      // Debug: log form data before sending
+      for (let pair of data.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
       await updateService(id, data);
       toast.success("Service updated successfully!");
-      navigate("/services");
+      navigate("/services", { state: { updated: true } });
     } catch (error) {
       toast.error("Failed to update service");
     } finally {
