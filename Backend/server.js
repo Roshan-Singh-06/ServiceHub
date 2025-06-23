@@ -28,7 +28,7 @@ connectDB();
 app.use(cors({
   origin: [
     'https://servicehub-user-frontend.onrender.com',
-    'https://servicehub-admin-frontend.onrender.com' // add any other frontend URLs you use
+    'https://servicehub-adminfrontend.onrender.com' // add any other frontend URLs you use
   ],
   credentials: true // if you use cookies/sessions
 }));
