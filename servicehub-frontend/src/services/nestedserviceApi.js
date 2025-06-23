@@ -1,32 +1,33 @@
-import api from './api';
+import api from "./api";
 
-// Fetch all nested services, optionally filtered by subservice
-export const getNestedServices = (params = {}) => {
-  // params: { subservice: 'Bath fittings' } or {}
-  return api.get('/nestedservice', { params });
+// Get all nested services (optionally with params)
+export const getNestedServices = (params = {}) =>
+  api.get("/nestedservice", { params });
+
+// Get a single nested service by ID
+export const getNestedServiceById = (id) =>
+  api.get(`/nestedservice/${id}`);
+
+// Create a new nested service (supports FormData for file upload)
+export const createNestedService = (data) => {
+  if (data instanceof FormData) {
+    return api.post("/nestedservice", data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  }
+  return api.post("/nestedservice", data);
 };
 
-// Fetch a single nested service by ID
-export const getNestedServiceById = (id) => {
-  return api.get(`/nestedservice/${id}`);
-};
-
-// Add a new nested service
-export const addNestedService = (data) => {
-  return api.post('/nestedservice', data);
-};
-
-// Update a nested service by ID
+// Update a nested service (supports FormData for file upload)
 export const updateNestedService = (id, data) => {
+  if (data instanceof FormData) {
+    return api.put(`/nestedservice/${id}`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  }
   return api.put(`/nestedservice/${id}`, data);
 };
 
-// Delete a nested service by ID
-export const deleteNestedService = (id) => {
-  return api.delete(`/nestedservice/${id}`);
-};
-
-// Fetch nested service name enums
-export const fetchNestedServiceNameEnums = () => {
-  return api.get('/nestedservice/names-enum');
-};
+// Delete a nested service
+export const deleteNestedService = (id) =>
+  api.delete(`/nestedservice/${id}`);
