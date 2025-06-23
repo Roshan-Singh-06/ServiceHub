@@ -25,15 +25,13 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 // Middleware
-app.use(
-  cors({
-    origin:
-      process.env.NODE_ENV === "production"
-        ? "https://admin-panel-1-rele.onrender.com"
-        : ["http://localhost:5173", "http://localhost:5174"],
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: [
+    'https://servicehub-user-frontend.onrender.com',
+    'https://servicehub-admin-frontend.onrender.com' // add any other frontend URLs you use
+  ],
+  credentials: true // if you use cookies/sessions
+}));
 
 
 app.use(cookieParser());
