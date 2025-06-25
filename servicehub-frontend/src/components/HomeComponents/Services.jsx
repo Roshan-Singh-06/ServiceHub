@@ -43,7 +43,8 @@ const Services = () => {
               onClick={() => {
                 navigate(`/subservices/${service.serviceName}`);
               }}
-              style={{ cursor: 'pointer' }}
+              style={{ cursor: 'pointer', minWidth: 270, maxWidth: 270, flex: '0 1 270px' }}
+              className="transition-transform duration-200 hover:scale-105"
             >
               <ServiceCard
                 title={service.serviceName}

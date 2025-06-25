@@ -113,6 +113,9 @@ const SubServiceList = () => {
                   <th className="py-4 px-6 border-b text-left font-semibold">
                     Icon
                   </th>
+                  <th className="py-4 px-6 border-b text-left font-semibold">
+                    Image
+                  </th>
                   <th className="py-4 px-6 border-b text-left font-semibold rounded-tr-xl">
                     Actions
                   </th>
@@ -136,6 +139,17 @@ const SubServiceList = () => {
                         </span>
                       ) : (
                         <span className="text-slate-400 italic">No icon</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-6 border-b align-middle">
+                      {sub.image ? (
+                        <img
+                          src={sub.image}
+                          alt={sub.category}
+                          className="w-20 h-20 object-cover rounded-lg border border-slate-200 shadow"
+                        />
+                      ) : (
+                        <span className="text-slate-400 italic">No image</span>
                       )}
                     </td>
                     <td className="py-4 px-6 border-b align-middle">

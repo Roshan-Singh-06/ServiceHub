@@ -4,7 +4,7 @@ export default function HeroSection() {
   const tags = [
     { icon: "💇‍♀️", label: "Women's Salon" },
     { icon: "🔧", label: "Home Repairs" },
-    { icon: "🧖‍♀️", label: "Spa Services" },
+    { icon: "🧖‍♀️", label: "Men saloon" },
     { icon: "⚡", label: "Electrical" },
   ];
 

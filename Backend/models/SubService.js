@@ -127,6 +127,10 @@ const subServiceSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  image: {
+    type: String,
+    default: '', // URL to the subservice image (optional)
+  },
   createdAt: {
     type: Date,
     default: Date.now,

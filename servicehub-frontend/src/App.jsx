@@ -7,9 +7,12 @@ import LoginPage from './components/Pages/LoginPage.jsx';
 import About from './components/Pages/About.jsx';
 import CheckoutPage from './components/Pages/CheckoutPage.jsx'
 
-import PlumberSection from './components/Pages/SubService.jsx';
-import WomenSalon from './components/Pages/WomenSalon.jsx';
+
+
 import SubServiceList from './components/Pages/SubService.jsx';
+import Cart from './components/Pages/Cart.jsx';
+import InnerService from './components/Pages/InnerService.jsx';
+import Booking from './components/Pages/Booking.jsx';
 
 export default function App() {
   return (
@@ -25,13 +28,16 @@ export default function App() {
               </div>
             </>
           } />
-          <Route path="/plumber" element={<PlumberSection />} />
-          <Route path="/WomenSalon" element={<WomenSalon />} />
-          <Route path="/women-salon" element={<WomenSalon />} />
+  
+        
+           <Route path="/booking" element={<Booking/>} />
+          <Route path="/checkout" element={<CheckoutPage/>} />
           <Route path="/login" element={<LoginPage/>} />
           <Route path="/about" element={<About />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/cart" element={<Cart />} />
           <Route path="/subservices/:serviceName" element={<SubServiceList />} />
+          <Route path="/innerservice" element={<InnerService />} />
+          <Route path="/innerservice/:serviceName" element={<InnerService/>} />
         </Routes>
       </Router>
     </ErrorBoundary>

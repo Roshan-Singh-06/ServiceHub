@@ -9,6 +9,8 @@ const EditSubService = () => {
   const [formData, setFormData] = useState({
     category: "",
     icon: "",
+    image: null, // Add image to formData
+    currentImage: "", // For displaying current image
   });
   const [loading, setLoading] = useState(false);
 
@@ -21,6 +23,8 @@ const EditSubService = () => {
         setFormData({
           category: subservice.category,
           icon: subservice.icon || "",
+          image: null,
+          currentImage: subservice.image || "",
         });
       } catch (error) {
         toast.error("Failed to fetch subservice details");
@@ -31,17 +35,24 @@ const EditSubService = () => {
   }, [id, navigate]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, files } = e.target;
+    if (type === "file") {
+      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.put(`/subservice/${id}`, {
-        category: formData.category,
-        icon: formData.icon,
+      const data = new FormData();
+      data.append("category", formData.category);
+      data.append("icon", formData.icon);
+      if (formData.image) data.append("image", formData.image);
+      await api.put(`/subservice/${id}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Subservice updated successfully");
       navigate(-1, { state: { updated: true } });
@@ -82,6 +93,23 @@ const EditSubService = () => {
             {formData.icon && (
               <span className="text-3xl mt-2 inline-block">{formData.icon}</span>
             )}
+          </div>
+          <div>
+            <label className="block text-slate-700 font-semibold mb-1">Image</label>
+            {formData.currentImage && (
+              <img
+                src={formData.currentImage}
+                alt="Current"
+                className="w-20 h-20 object-cover rounded-lg border border-slate-200 shadow mb-2"
+              />
+            )}
+            <input
+              type="file"
+              name="image"
+              accept="image/*"
+              onChange={handleChange}
+              className="w-full border border-slate-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-300"
+            />
           </div>
           <button
             type="submit"

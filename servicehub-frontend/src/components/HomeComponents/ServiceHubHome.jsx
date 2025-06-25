@@ -3,25 +3,25 @@ import { FaWrench, FaPaintRoller, FaLock, FaTools, FaMale, FaFemale, FaWater, Fa
 import { useNavigate } from 'react-router-dom';
 
 const services = [
-  { icon: <FaFemale />, label: "Women's Salon & Spa" },
-  { icon: <FaMale />, label: "Men's Salon & Massage" },
-  { icon: <FaFan />, label: "AC & Appliance Repair" },
-  { icon: <FaBug />, label: "Cleaning & Pest Control" },
-  { icon: <FaTools />, label: "Electrician, Plumber & Carpenter" },
-  { icon: <FaWater />, label: "Native Water Purifier" },
-  { icon: <FaLock />, label: "Native Smart Locks" },
-  { icon: <FaPaintRoller />, label: "Walls & Rooms Painting" },
-  { icon: <FaWrench />, label: "Wall Panels" }
+  { icon: <FaFemale />, label: "Women's Salon & Spa", name: "Women Salon & Spa" },
+  { icon: <FaMale />, label: "Men's Salon & Massage", name: "Men's Salon & Spa" },
+  { icon: <FaFan />, label: "AC & Appliance Repair", name: "AC & Appliance Repair" },
+  { icon: <FaBug />, label: "Cleaning & Pest Control", name: "Cleaning Services" },
+  { icon: <FaTools />, label: "Electrician, Plumber & Carpenter", name: "Electrician, Plumber & Carpenter" },
+  { icon: <FaWater />, label: "Native Water Purifier", name: "Native Water Purifier" },
+  { icon: <FaLock />, label: "Native Smart Locks", name: "Native Smart Locks" },
+  { icon: <FaPaintRoller />, label: "Walls & Rooms Painting", name: "Walls & Rooms Painting" },
+  { icon: <FaWrench />, label: "Wall Panels", name: "Wall Panels" }
 ];
 
 export default function ServiceHubHome() {
+  const navigate = useNavigate();
+
   // Images from public/images folder
   const img1 = '/images/img1.jpg';
   const img2 = '/images/img2.jpg';
   const img3 = '/images/img3.jpg';
   const img4 = '/images/img4.jpg';
-
-  const navigate = useNavigate();
 
   return (
     <section className="min-h-screen bg-gradient-to-br from-[#1f4959] via-[#5c7c89] to-[#e6f2f1] py-12 px-4 flex flex-col items-center justify-center">
@@ -40,9 +40,7 @@ export default function ServiceHubHome() {
                 key={index}
                 className="flex flex-col items-center p-5 bg-white/90 rounded-2xl border border-[#5c7c89] hover:bg-[#5c7c89] hover:text-white transition-all duration-300 shadow-md hover:shadow-xl cursor-pointer group"
                 onClick={() => {
-                  if (service.label === "Women's Salon & Spa") {
-                    navigate('/WomenSalon');
-                  }
+                  navigate(`/innerservice/${service.name}`);
                 }}
               >
                 <div className="text-3xl mb-2 group-hover:text-white text-[#1f4959]">{service.icon}</div>
@@ -51,7 +49,6 @@ export default function ServiceHubHome() {
             ))}
           </div>
         </div>
-
         {/* Right - L-shaped Images in a Square Card */}
         <div className="lg:w-1/2 w-full flex justify-center">
           <div className="bg-white/90 rounded-2xl border-4 border-[#5c7c89] shadow-xl p-6 w-[600px] h-[600px] grid grid-cols-3 grid-rows-3 gap-4">
@@ -85,3 +82,4 @@ export default function ServiceHubHome() {
     </section>
   );
 }
+// filepath: d:\Desktop\ServiceHub\servicehub-frontend\src\components\HomeComponents\ServiceHubHome.jsx

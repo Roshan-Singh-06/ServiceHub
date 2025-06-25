@@ -10,6 +10,7 @@ const AddSubService = () => {
   const [formData, setFormData] = useState({
     category: "",
     icon: "",
+    image: null, // Add image to formData
   });
   const [loading, setLoading] = useState(false);
   const [serviceName, setServiceName] = useState("");
@@ -39,30 +40,30 @@ const AddSubService = () => {
   }, [serviceId]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, files } = e.target;
+    if (type === "file") {
+      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Debug: log what is being sent
-      console.log({
-        service: serviceName,
-        category: formData.category,
-        icon: formData.icon,
-      });
       if (!serviceName || !formData.category || !formData.icon) {
         toast.error("All fields are required.");
         setLoading(false);
         return;
       }
-      await createSubService({
-        service: serviceName,
-        category: formData.category,
-        icon: formData.icon,
-      });
+      // Use FormData for file upload
+      const data = new FormData();
+      data.append("service", serviceName);
+      data.append("category", formData.category);
+      data.append("icon", formData.icon);
+      if (formData.image) data.append("image", formData.image);
+      await createSubService(data, true); // Pass true to indicate multipart
       toast.success("SubService added successfully!");
       navigate("/services");
     } catch (error) {
@@ -121,6 +122,16 @@ const AddSubService = () => {
           {formData.icon && (
             <span className="text-3xl mt-2 inline-block">{formData.icon}</span>
           )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Image</label>
+          <input
+            type="file"
+            name="image"
+            accept="image/*"
+            onChange={handleChange}
+            className="w-full px-4 py-2 border rounded-md"
+          />
         </div>
         <button
           type="submit"

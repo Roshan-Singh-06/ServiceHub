@@ -7,45 +7,48 @@ import cloudinary from '../utils/cloudinary.js';
 // Create a new nested service
 export const createNestedService = asyncHandler(async (req, res) => {
   const { subservice, name, price, time, desc } = req.body;
-  let imageUrl = '';
+  let imageUrl = req.body.image || '';
 
-  try {
-    // If an image file is uploaded, upload to Cloudinary
-    if (req.file) {
-      await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { resource_type: 'image', folder: 'servicehub/nestedservices' },
-          (error, result) => {
-            if (error) {
-              console.error('Cloudinary upload error:', error);
-              reject(new ApiError(500, 'Cloudinary upload failed: ' + error.message));
-            } else {
-              imageUrl = result.secure_url;
-              resolve();
-            }
+  // If an image file is uploaded, upload to Cloudinary
+  if (req.file) {
+    await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { resource_type: 'image', folder: 'servicehub/nestedservices' },
+        (error, result) => {
+          if (error) {
+            console.error('Cloudinary upload error:', error);
+            reject(new ApiError(500, 'Cloudinary upload failed: ' + error.message));
+          } else {
+            imageUrl = result.secure_url;
+            resolve();
           }
-        );
-        stream.end(req.file.buffer);
-      });
-    } else if (typeof req.body.image === 'string' && req.body.image.trim() !== '') {
-      imageUrl = req.body.image;
-    }
-  } catch (err) {
-    console.error('Cloudinary upload failed:', err);
-    return res.status(500).json({ message: 'Cloudinary upload failed', error: err.message });
+        }
+      );
+      stream.end(req.file.buffer);
+    });
   }
 
-  if (!subservice || !name || !price || !time || !desc) {
+  // Ensure imageUrl is always a string
+  if (typeof imageUrl !== 'string') {
+    imageUrl = '';
+  }
+
+  if (!subservice || !name || !price || !time || !desc || !imageUrl) {
     throw new ApiError(400, 'All fields are required');
   }
   // Validate name against enum
   if (!nestedServiceNamesEnum[subservice] || !nestedServiceNamesEnum[subservice].includes(name)) {
     throw new ApiError(400, 'Invalid nested service name for selected subservice');
   }
-  // Only set image if it's a non-empty string
-  const doc = { subservice, name, price, time, desc };
-  if (imageUrl && typeof imageUrl === 'string') doc.image = imageUrl;
-  const nestedService = new NestedService(doc);
+
+  const nestedService = new NestedService({
+    subservice,
+    name,
+    price,
+    time,
+    desc,
+    image: imageUrl, // Always a string
+  });
   await nestedService.save();
   res.status(201).json(new ApiResponse(201, nestedService, 'Nested service created successfully'));
 });

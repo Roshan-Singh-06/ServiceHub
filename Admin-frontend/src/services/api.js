@@ -12,7 +12,6 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// ...existing code...
 export const login = (credentials) =>
   api.post("/auth/login", credentials, { withCredentials: true });
 export const register = (userData) => api.post("/auth/register", userData, { withCredentials: true });
@@ -36,8 +35,14 @@ export const updateService = (id, formData) =>
     headers: { "Content-Type": "multipart/form-data" },
   });
 export const deleteService = (id) => api.delete(`/service/${id}`);
-export const createSubService = (formData) =>
-  api.post("/subservice", formData);
+export const createSubService = (formData, isMultipart = false) =>
+  api.post(
+    "/subservice",
+    formData,
+    isMultipart
+      ? { headers: { "Content-Type": "multipart/form-data" } }
+      : undefined
+  );
 
 export const creatadmin = (adminData) => api.post("/users", adminData);
 export const getsummary = (name, price, dimension, category) =>

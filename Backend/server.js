@@ -12,6 +12,8 @@ import userRoutes from './routes/user.js';
 import subServiceRoutes from './routes/subService.js'; // Import subServiceRoutes
 import nestedServiceRoutes from './routes/nestedService.js';
 import path from 'path';
+import  cartRoutes from './routes/cart.js'; // Use import * as for CommonJS-style exports
+import bookingRoutes from './routes/booking.js'; // Import bookingRoutes
 
 // Load environment variables
 dotenv.config();
@@ -28,7 +30,9 @@ connectDB();
 app.use(cors({
   origin: [
     'https://servicehub-user-frontend.onrender.com',
-    'https://servicehub-adminfrontend.onrender.com' // add any other frontend URLs you use
+    'https://servicehub-adminfrontend.onrender.com',
+    'http://localhost:5173',
+    'http://localhost:5174' // add any other frontend URLs you use
   ],
   credentials: true // if you use cookies/sessions
 }));
@@ -47,6 +51,8 @@ app.use('/api/service', serviceRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/subService', subServiceRoutes); // Register subService routes
 app.use('/api/nestedservice', nestedServiceRoutes);
+app.use('/api/cart', cartRoutes.default || cartRoutes); // Use .default if present, else use the module itself
+app.use('/api/booking', bookingRoutes); // Register booking routes
 
 
 app.use((req, res, next) => {
@@ -63,9 +69,7 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   console.error('Error:', err); // Add this line for debugging
   const statusCode = err.statusCode || 500;
-  return res
-    .status(statusCode)
-    .json(new ApiError(statusCode, err.message || 'Internal Server Error', err.errors || []));
+  res.status(statusCode).json(new ApiError(statusCode, err.message || 'Internal Server Error', err.errors || []));
 });
 // Start Server
 app.listen(PORT, () => {

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../services/api";
-import { getNestedServices } from "../services/nestedserviceApi";
+import { getNestedServices, createNestedService } from "../services/nestedserviceApi";
 
 // Fetch nested service name enums from backend
 const fetchNestedServiceNameEnums = async () => {
@@ -73,8 +73,8 @@ const AddNestedService = () => {
       data.append('price', formData.price);
       data.append('time', formData.time);
       data.append('desc', formData.desc);
-      if (formData.image) data.append('image', formData.image);
-      await api.post("/nestedservice", data);
+      if (formData.image) data.append('image', formData.image); // formData.image must be a File object
+      await createNestedService(data);
       toast.success("Nested service added successfully!");
       // After add, go to NestedServiceList for this subservice
       navigate("/nestedservices", {
@@ -206,6 +206,11 @@ const AddNestedService = () => {
                   <strong>{ns.name}</strong> (₹{ns.price}, {ns.time})
                   <br />
                   <span className="text-slate-600">{ns.desc}</span>
+                  {ns.image && (
+                    <div className="mt-2">
+                      <img src={ns.image} alt={ns.name} className="w-20 h-20 object-cover rounded border mt-2" />
+                    </div>
+                  )}
                 </li>
               ))}
           </ul>

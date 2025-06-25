@@ -1,4 +1,5 @@
 import { FaShoppingCart, FaMapMarkerAlt } from "react-icons/fa";
+import { FaBook } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../api/axiosInstance';
@@ -10,6 +11,8 @@ export default function Navbar() {
   const [loading, setLoading] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(() => localStorage.getItem('selectedState') || '');
   const [locationModalOpen, setLocationModalOpen] = useState(false);
+
+  const isLoggedIn = !!localStorage.getItem('accessToken');
 
   useEffect(() => {
     const handleStorage = () => {
@@ -26,7 +29,7 @@ export default function Navbar() {
       localStorage.removeItem('accessToken');
       alert('Logout successful!');
       navigate('/login');
-    } catch (err) {
+    } catch {
       alert('Logout failed. Please try again.');
     } finally {
       setLoading(false);
@@ -64,14 +67,21 @@ export default function Navbar() {
                 {selectedLocation ? selectedLocation : 'Select Location'}
               </span>
             </div>
-            <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer">
+            <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer" onClick={() => navigate('/cart')}>
               <FaShoppingCart className="text-lg" />
               <span className="text-sm md:text-base">Cart</span>
             </div>
-            <button className="bg-[#5c7c89] text-white px-4 py-1 rounded-md hover:bg-[#4e6a78] text-sm md:text-base" onClick={() => navigate('/login')}>Login</button>
-            <button className="bg-black text-white px-4 py-1 rounded-md hover:bg-gray-900 text-sm md:text-base" onClick={handleLogout} disabled={loading}>
-              {loading ? 'Logging out...' : 'Logout'}
-            </button>
+            <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer" onClick={() => navigate('/booking')}>
+              <FaBook className="text-lg" />
+              <span className="text-sm md:text-base font-semibold">My Booking</span>
+            </div>
+            {isLoggedIn ? (
+              <button className="bg-black text-white px-4 py-1 rounded-md hover:bg-gray-900 text-sm md:text-base" onClick={handleLogout} disabled={loading}>
+                {loading ? 'Logging out...' : 'Logout'}
+              </button>
+            ) : (
+              <button className="bg-[#5c7c89] text-white px-4 py-1 rounded-md hover:bg-[#4e6a78] text-sm md:text-base" onClick={() => navigate('/login')}>Login</button>
+            )}
           </div>
         </div>
       </div>
@@ -86,7 +96,7 @@ export default function Navbar() {
             <FaMapMarkerAlt className="text-lg" />
             <span className="text-sm">Select Location</span>
           </div>
-          <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer">
+          <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer" onClick={() => { setMenuOpen(false); navigate('/cart'); }}>
             <FaShoppingCart className="text-lg" />
             <span className="text-sm">Cart</span>
           </div>

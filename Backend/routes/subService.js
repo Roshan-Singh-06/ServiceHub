@@ -7,11 +7,12 @@ import {
   deleteSubService
 } from '../controllers/subServiceController.js';
 import { subServiceCategory } from '../models/SubService.js';
+import upload from '../middleware/multer.js';
 
 const router = express.Router();
 
-// Create a new subservice (icon is a string, no file upload)
-router.post('/', createSubService);
+// Create a new subservice with image upload
+router.post('/', upload.single('image'), createSubService);
 
 // Get all subservices (optionally filter by service or category)
 router.get('/', getAllSubServices);
@@ -24,11 +25,7 @@ router.get('/categories/:service', (req, res) => {
   let { service } = req.params;
   // Try to decode URI component in case it's encoded
   try { service = decodeURIComponent(service); } catch {}
-  // Log the import for debugging
-  console.log('subServiceCategory:', subServiceCategory);
-  // Log the received service param and all available keys for debugging
-  console.log('Requested service:', service);
-  console.log('Available services:', Object.keys(subServiceCategory));
+  
   if (!subServiceCategory[service]) {
     return res.status(404).json({ categories: [], message: `No categories found for service: ${service}` });
   }
@@ -47,8 +44,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Update a subservice (PUT for full update, PATCH for partial)
-router.put('/:id', updateSubService);
+router.put('/:id', upload.single('image'), updateSubService);
+router.patch('/:id', upload.single('image'), updateSubService);
 
 // Delete a subservice
 router.delete('/:id', deleteSubService);

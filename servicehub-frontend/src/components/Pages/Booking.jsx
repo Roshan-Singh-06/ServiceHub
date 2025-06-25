@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getAllBookings } from '../services/bookingApi';
+import Navbar from '../Navbar';
+import { getUserBookings } from '../../services/userBookingApi';
 
 const statusColors = {
   pending: 'bg-yellow-100 text-yellow-800',
@@ -8,13 +9,13 @@ const statusColors = {
   cancelled: 'bg-red-100 text-red-800',
 };
 
-export default function Bookings() {
+export default function Booking() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    getAllBookings()
+    getUserBookings()
       .then(res => {
         setBookings(res.data.bookings || []);
         setLoading(false);
@@ -27,8 +28,9 @@ export default function Bookings() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#e6f2f1] via-[#5c7c89] to-[#1f4959] font-sans pb-10">
-      <div className="max-w-6xl mx-auto mt-0 p-6">
-        <h1 className="text-4xl md:text-5xl font-extrabold mb-10 text-center text-black drop-shadow-lg tracking-tight uppercase">All Bookings</h1>
+      <Navbar />
+      <div className="max-w-4xl mx-auto mt-14 p-6">
+        <h1 className="text-4xl md:text-5xl font-extrabold mb-10 text-center text-black drop-shadow-lg tracking-tight uppercase">My Bookings</h1>
         {loading ? (
           <div className="text-center text-[#5c7c89] text-lg">Loading...</div>
         ) : error ? (
@@ -45,7 +47,6 @@ export default function Bookings() {
                     <p className="text-[#5c7c89] text-sm">Phone: {booking.phone}</p>
                     <p className="text-[#5c7c89] text-sm">Address: {booking.address}</p>
                     <p className="text-[#5c7c89] text-sm">Slot: {new Date(booking.slot).toLocaleString()}</p>
-                    <p className="text-[#5c7c89] text-sm">User ID: {booking.user || 'Guest'}</p>
                   </div>
                   <div className={`px-4 py-2 rounded-xl font-semibold text-sm text-center ${statusColors[booking.status] || 'bg-gray-200 text-gray-800'}`}>{booking.status}</div>
                 </div>
