@@ -1,11 +1,13 @@
 import { Typewriter } from 'react-simple-typewriter';
+import { useNavigate } from 'react-router-dom';
 
 export default function HeroSection() {
+   const navigate = useNavigate();
   const tags = [
-    { icon: "💇‍♀️", label: "Women's Salon" },
-    { icon: "🔧", label: "Home Repairs" },
-    { icon: "🧖‍♀️", label: "Men saloon" },
-    { icon: "⚡", label: "Electrical" },
+    { icon: "💇‍♀️", label: "Women Salon & Spa" },
+    { icon: "🔧", label: "Cleaning Services" },
+    { icon: "🧖‍♀️", label: "Men's Salon & Spa" },
+    { icon: "⚡", label: "AC & Appliance Repair" },
   ];
 
   const descriptions = [
@@ -22,6 +24,7 @@ export default function HeroSection() {
   ];
 
   return (
+     
     <section className="bg-gradient-to-b from-[#1f4959] to-[#5c7c89] text-white min-h-[70vh] flex flex-col items-center justify-center text-center px-4 py-10 sm:py-16 md:py-24">
       <h1 className="text-3xl sm:text-5xl font-extrabold mb-2 text-white">Professional Services</h1>
       <h2 className="text-xl sm:text-4xl font-bold text-[#b0c4ce] mb-6">At Your Doorstep</h2>
@@ -72,6 +75,10 @@ export default function HeroSection() {
           <span
             key={index}
             className="flex items-center space-x-1 bg-[#5c7c89] px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-white hover:bg-[#4e6a78] text-xs sm:text-sm md:text-base"
+            onClick={() => {
+              navigate(`/innerservice/${tag.label}`);
+            }}
+            style={{ cursor: 'pointer' }}
           >
             <span>{tag.icon}</span>
             <span>{tag.label}</span>
