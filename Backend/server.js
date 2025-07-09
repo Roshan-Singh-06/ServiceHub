@@ -44,6 +44,12 @@ app.use(cookieParser());
 console.log('Serving static files from:', path.resolve('uploads'));
 app.use('/uploads', express.static('uploads'));
 
+// Add debug middleware to log all requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/location', locationRoutes);

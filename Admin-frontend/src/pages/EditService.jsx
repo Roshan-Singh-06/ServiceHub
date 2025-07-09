@@ -11,9 +11,11 @@ const EditService = () => {
     description: "",
     price: "",
     image: null,
+    video: null,
   });
   const [loading, setLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
+  const [previewVideo, setPreviewVideo] = useState("");
 
   useEffect(() => {
     const fetchService = async () => {
@@ -26,8 +28,10 @@ const EditService = () => {
           description: service.description,
           price: service.price,
           image: null,
+          video: null,
         });
         setPreviewImage(service.image || "");
+        setPreviewVideo(service.video || "");
       } catch (error) {
         toast.error("Failed to fetch service details");
         navigate("/services");
@@ -49,6 +53,14 @@ const EditService = () => {
     }
   };
 
+  const handleVideoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, video: file }));
+      setPreviewVideo(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -58,6 +70,7 @@ const EditService = () => {
       data.append("description", formData.description);
       data.append("price", formData.price);
       if (formData.image) data.append("image", formData.image);
+      if (formData.video) data.append("video", formData.video);
       // Debug: log form data before sending
       for (let pair of data.entries()) {
         console.log(pair[0] + ': ' + pair[1]);

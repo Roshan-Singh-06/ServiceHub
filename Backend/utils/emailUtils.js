@@ -28,7 +28,7 @@ export async function sendOTPEmail({ to, otp }) {
       <h2>ServiceHub Email Verification</h2>
       <p>Your OTP code is:</p>
       <div style="font-size:2rem; font-weight:bold; letter-spacing:0.2em;">${otp}</div>
-      <p>This code is valid for 10 minutes.</p>
+      <p>This code is valid for 1 minute only.</p>
     </div>`,
   };
   await transporter.sendMail(mailOptions);

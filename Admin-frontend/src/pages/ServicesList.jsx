@@ -73,6 +73,9 @@ const ServicesList = () => {
                 Image
               </th>
               <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+                Video
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
                 Name
               </th>
               <th className="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
@@ -90,7 +93,7 @@ const ServicesList = () => {
             {services.length === 0 ? (
               <tr>
                 <td
-                  colSpan="5"
+                  colSpan="6"
                   className="text-center py-8 text-gray-500 dark:text-gray-400"
                 >
                   No services found.
@@ -108,6 +111,23 @@ const ServicesList = () => {
                       alt={service.serviceName}
                       className="h-14 w-14 rounded-lg object-cover border border-gray-200 dark:border-gray-700 shadow"
                     />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {service.video ? (
+                      <video
+                        src={service.video}
+                        className="h-14 w-20 rounded-lg object-cover border border-gray-200 dark:border-gray-700 shadow"
+                        controls={false}
+                        muted
+                        onMouseEnter={(e) => e.target.play()}
+                        onMouseLeave={(e) => {
+                          e.target.pause();
+                          e.target.currentTime = 0;
+                        }}
+                      />
+                    ) : (
+                      <span className="text-gray-400 text-sm">No video</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap font-semibold text-gray-800 dark:text-white">
                     {service.serviceName}

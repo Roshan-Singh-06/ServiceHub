@@ -22,6 +22,7 @@ const AddService = () => {
     description: "",
     price: "",
     image: null,
+    video: null,
   });
   const [loading, setLoading] = useState(false);
 
@@ -35,6 +36,11 @@ const AddService = () => {
     setFormData((prev) => ({ ...prev, image: file }));
   };
 
+  const handleVideoChange = (e) => {
+    const file = e.target.files[0];
+    setFormData((prev) => ({ ...prev, video: file }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -44,6 +50,7 @@ const AddService = () => {
       data.append("description", formData.description);
       data.append("price", formData.price);
       if (formData.image) data.append("image", formData.image);
+      if (formData.video) data.append("video", formData.video);
       await createService(data);
       toast.success("Service added successfully!");
       navigate("/services");
@@ -97,6 +104,27 @@ const AddService = () => {
               hover:file:bg-[#d1d5db]"
               required
             />
+          </div>
+          {/* Video Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Service Video <span className="text-gray-500">(Optional)</span>
+            </label>
+            <input
+              type="file"
+              name="video"
+              accept="video/*"
+              onChange={handleVideoChange}
+              className="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-50 focus:ring-2 focus:ring-[#5c7c89] focus:border-[#5c7c89] dark:bg-gray-700 dark:border-gray-600 dark:text-white
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-md file:border-0
+              file:text-sm file:font-semibold
+              file:bg-[#e3e8ee] file:text-[#1f4959]
+              hover:file:bg-[#d1d5db]"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Upload a demonstration video for this service (Max: 100MB, MP4/AVI/MOV)
+            </p>
           </div>
           {/* Description */}
           <div>

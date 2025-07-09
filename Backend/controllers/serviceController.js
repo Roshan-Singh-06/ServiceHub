@@ -9,9 +9,54 @@ export const createService = asyncHandler(async (req, res) => {
   try {
     const { serviceName, description, price } = req.body;
     let imageUrl = req.body.image || '';
+    let videoUrl = req.body.video || '';
 
-    // If an image file is uploaded, upload to Cloudinary
-    if (req.file) {
+    // Handle multiple file uploads (image and video)
+    if (req.files) {
+      // Handle image upload
+      if (req.files.image && req.files.image[0]) {
+        await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { resource_type: 'image', folder: 'servicehub/services' },
+            (error, result) => {
+              if (error) {
+                console.error('Cloudinary image upload error:', error);
+                reject(new ApiError(500, 'Image upload failed'));
+              } else {
+                imageUrl = result.secure_url;
+                resolve();
+              }
+            }
+          );
+          stream.end(req.files.image[0].buffer);
+        });
+      }
+
+      // Handle video upload
+      if (req.files.video && req.files.video[0]) {
+        await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { 
+              resource_type: 'video', 
+              folder: 'servicehub/services/videos',
+              chunk_size: 6000000, // 6MB chunks for large video files
+            },
+            (error, result) => {
+              if (error) {
+                console.error('Cloudinary video upload error:', error);
+                reject(new ApiError(500, 'Video upload failed'));
+              } else {
+                videoUrl = result.secure_url;
+                resolve();
+              }
+            }
+          );
+          stream.end(req.files.video[0].buffer);
+        });
+      }
+    }
+    // Handle single file upload (backward compatibility)
+    else if (req.file) {
       await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           { resource_type: 'image', folder: 'servicehub/services' },
@@ -36,7 +81,8 @@ export const createService = asyncHandler(async (req, res) => {
       serviceName,
       description,
       price,
-      image: imageUrl, // This should be a URL or path if using file upload
+      image: imageUrl,
+      video: videoUrl,
     });
     await service.save();
     res.status(201).json(new ApiResponse(201, service, 'Service created successfully'));
@@ -71,10 +117,53 @@ export const updateService = asyncHandler(async (req, res) => {
     price = req.body.price !== undefined ? Number(req.body.price) : (req.body["price"] !== undefined ? Number(req.body["price"]) : "");
   }
   let imageUrl = req.body && typeof req.body === 'object' && 'image' in req.body ? req.body.image : undefined;
+  let videoUrl = req.body && typeof req.body === 'object' && 'video' in req.body ? req.body.video : undefined;
 
   try {
-    // If an image file is uploaded, upload to Cloudinary
-    if (req.file) {
+    // Handle multiple file uploads (image and video)
+    if (req.files) {
+      // Handle image upload
+      if (req.files.image && req.files.image[0]) {
+        await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { resource_type: 'image', folder: 'servicehub/services' },
+            (error, result) => {
+              if (error) {
+                reject(new ApiError(500, 'Image upload failed'));
+              } else {
+                imageUrl = result.secure_url;
+                resolve();
+              }
+            }
+          );
+          stream.end(req.files.image[0].buffer);
+        });
+      }
+
+      // Handle video upload
+      if (req.files.video && req.files.video[0]) {
+        await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { 
+              resource_type: 'video', 
+              folder: 'servicehub/services/videos',
+              chunk_size: 6000000, // 6MB chunks for large video files
+            },
+            (error, result) => {
+              if (error) {
+                reject(new ApiError(500, 'Video upload failed'));
+              } else {
+                videoUrl = result.secure_url;
+                resolve();
+              }
+            }
+          );
+          stream.end(req.files.video[0].buffer);
+        });
+      }
+    }
+    // Handle single file upload (backward compatibility)
+    else if (req.file) {
       await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
           { resource_type: 'image', folder: 'servicehub/services' },
@@ -96,7 +185,8 @@ export const updateService = asyncHandler(async (req, res) => {
       ...(serviceName && { serviceName }),
       ...(description && { description }),
       ...(price && { price }),
-      ...(imageUrl && { image: imageUrl })
+      ...(imageUrl && { image: imageUrl }),
+      ...(videoUrl && { video: videoUrl })
     });
 
     // Always fetch the latest service after update
@@ -106,7 +196,8 @@ export const updateService = asyncHandler(async (req, res) => {
         ...(serviceName && { serviceName }),
         ...(description && { description }),
         ...(price && { price }),
-        ...(imageUrl && { image: imageUrl })
+        ...(imageUrl && { image: imageUrl }),
+        ...(videoUrl && { video: videoUrl })
       },
       { new: true, runValidators: true }
     );

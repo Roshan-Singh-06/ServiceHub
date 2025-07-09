@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Home from './components/Pages/Home';
 import Footer from './components/Footer';
@@ -17,29 +18,31 @@ import Booking from './components/Pages/Booking.jsx';
 export default function App() {
   return (
     <ErrorBoundary>
-      <Router>
-        <Routes>
-          <Route path="/" element={
-            <>
-              <Navbar />
-              <div className="pt-20">
-                <Home />
-                <Footer/>
-              </div>
-            </>
-          } />
+      <AuthProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={
+              <>
+                <Navbar />
+                <div className="pt-20">
+                  <Home />
+                  <Footer/>
+                </div>
+              </>
+            } />
   
         
            <Route path="/booking" element={<Booking/>} />
-          <Route path="/checkout" element={<CheckoutPage/>} />
-          <Route path="/login" element={<LoginPage/>} />
-          <Route path="/about" element={<About />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/subservices/:serviceName" element={<SubServiceList />} />
-          <Route path="/innerservice" element={<InnerService />} />
-          <Route path="/innerservice/:serviceName" element={<InnerService/>} />
-        </Routes>
-      </Router>
+            <Route path="/checkout" element={<CheckoutPage/>} />
+            <Route path="/login" element={<LoginPage/>} />
+            <Route path="/about" element={<About />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/subservices/:serviceName" element={<SubServiceList />} />
+            <Route path="/innerservice" element={<InnerService />} />
+            <Route path="/innerservice/:serviceName" element={<InnerService/>} />
+          </Routes>
+        </Router>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }

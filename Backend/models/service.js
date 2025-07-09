@@ -27,6 +27,10 @@ const serviceSchema = new mongoose.Schema({
     type: String, // Store image URL or path
     required: false,
   },
+  video: {
+    type: String, // Store video URL or path
+    required: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

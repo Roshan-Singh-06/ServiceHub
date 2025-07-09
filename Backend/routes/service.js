@@ -5,8 +5,11 @@ import upload from '../middleware/multer.js';
 
 const router = express.Router();
 
-// Create a new service (admin only, with image upload)
-router.post('/', authenticate, authorizeAdmin, upload.single('image'), createService);
+// Create a new service (admin only, with image and video upload)
+router.post('/', authenticate, authorizeAdmin, upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'video', maxCount: 1 }
+]), createService);
 
 // Get all services
 router.get('/', getServices);
@@ -15,7 +18,10 @@ router.get('/', getServices);
 router.get('/:id', getServiceById);
 
 // Update a service (admin only)
-router.put('/:id', authenticate, authorizeAdmin, upload.single('image'), updateService);
+router.put('/:id', authenticate, authorizeAdmin, upload.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'video', maxCount: 1 }
+]), updateService);
 
 // Delete a service (admin only)
 router.delete('/:id', authenticate, authorizeAdmin, deleteService);

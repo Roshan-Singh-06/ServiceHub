@@ -2,17 +2,17 @@ import { FaShoppingCart, FaMapMarkerAlt } from "react-icons/fa";
 import { FaBook } from "react-icons/fa6";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import axiosInstance from '../api/axiosInstance';
+import { useAuth } from '../context/AuthContext';
 import LocationModal from './Pages/LocationModal';
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState(() => localStorage.getItem('selectedState') || '');
   const [locationModalOpen, setLocationModalOpen] = useState(false);
-
-  const isLoggedIn = !!localStorage.getItem('accessToken');
+  
+  const { isAuthenticated, logout } = useAuth();
+  const [logoutLoading, setLogoutLoading] = useState(false);
 
   useEffect(() => {
     const handleStorage = () => {
@@ -22,17 +22,31 @@ export default function Navbar() {
     return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
+  const scrollToSection = (sectionId, closeMenu) => {
+    if (closeMenu) closeMenu(false);
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // If not on home page, navigate to home and then scroll
+      navigate('/', { state: { scrollTo: sectionId } });
+    }
+  };
+
   const handleLogout = async () => {
-    setLoading(true);
+    setLogoutLoading(true);
     try {
-      await axiosInstance.post('/auth/logout');
-      localStorage.removeItem('accessToken');
-      alert('Logout successful!');
-      navigate('/login');
+      const result = await logout();
+      if (result.success) {
+        alert('Logout successful!');
+        navigate('/');
+      } else {
+        alert('Logout failed. Please try again.');
+      }
     } catch {
       alert('Logout failed. Please try again.');
     } finally {
-      setLoading(false);
+      setLogoutLoading(false);
     }
   };
 
@@ -71,13 +85,16 @@ export default function Navbar() {
               <FaShoppingCart className="text-lg" />
               <span className="text-sm md:text-base">Cart</span>
             </div>
-            <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer" onClick={() => navigate('/booking')}>
-              <FaBook className="text-lg" />
-              <span className="text-sm md:text-base font-semibold">My Booking</span>
-            </div>
-            {isLoggedIn ? (
-              <button className="bg-black text-white px-4 py-1 rounded-md hover:bg-gray-900 text-sm md:text-base" onClick={handleLogout} disabled={loading}>
-                {loading ? 'Logging out...' : 'Logout'}
+            {/* Show My Booking only if authenticated */}
+            {isAuthenticated && (
+              <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer" onClick={() => navigate('/booking')}>
+                <FaBook className="text-lg" />
+                <span className="text-sm md:text-base font-semibold">My Booking</span>
+              </div>
+            )}
+            {isAuthenticated ? (
+              <button className="bg-black text-white px-4 py-1 rounded-md hover:bg-gray-900 text-sm md:text-base" onClick={handleLogout} disabled={logoutLoading}>
+                {logoutLoading ? 'Logging out...' : 'Logout'}
               </button>
             ) : (
               <button className="bg-[#5c7c89] text-white px-4 py-1 rounded-md hover:bg-[#4e6a78] text-sm md:text-base" onClick={() => navigate('/login')}>Login</button>
@@ -100,10 +117,21 @@ export default function Navbar() {
             <FaShoppingCart className="text-lg" />
             <span className="text-sm">Cart</span>
           </div>
-          <button className="bg-[#5c7c89] text-white px-4 py-1 rounded-md hover:bg-[#4e6a78] text-sm w-full md:w-auto" onClick={() => { setMenuOpen(false); navigate('/login'); }}>Login</button>
-          <button className="bg-black text-white px-4 py-1 rounded-md hover:bg-gray-900 text-sm w-full" onClick={handleLogout} disabled={loading}>
-            {loading ? 'Logging out...' : 'Logout'}
-          </button>
+          {/* Show My Booking only if authenticated */}
+          {isAuthenticated && (
+            <div className="flex items-center space-x-2 text-[#242424] hover:text-black cursor-pointer" onClick={() => { setMenuOpen(false); navigate('/booking'); }}>
+              <FaBook className="text-lg" />
+              <span className="text-sm font-semibold">My Booking</span>
+            </div>
+          )}
+          {/* Show login or logout based on authentication */}
+          {isAuthenticated ? (
+            <button className="bg-black text-white px-4 py-1 rounded-md hover:bg-gray-900 text-sm w-full" onClick={handleLogout} disabled={logoutLoading}>
+              {logoutLoading ? 'Logging out...' : 'Logout'}
+            </button>
+          ) : (
+            <button className="bg-[#5c7c89] text-white px-4 py-1 rounded-md hover:bg-[#4e6a78] text-sm w-full md:w-auto" onClick={() => { setMenuOpen(false); navigate('/login'); }}>Login</button>
+          )}
         </div>
       )}
       <LocationModal

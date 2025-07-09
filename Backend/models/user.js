@@ -5,15 +5,20 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      required: [true, 'Username is required'],
+      required: function() {
+        return !this.isTemporary;
+      },
       trim: true,
       unique: true,
+      sparse: true, // Allow multiple null values
       minlength: 3,
       maxlength: 30,
     },
     name: {
       type: String,
-      required: [true, 'Full name is required'],
+      required: function() {
+        return !this.isTemporary;
+      },
       trim: true,
       maxlength: 50,
     },
@@ -30,7 +35,9 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
+      required: function() {
+        return !this.isTemporary;
+      },
       minlength: 6,
       select: false, // Do not return password by default
     },
@@ -55,6 +62,11 @@ const userSchema = new mongoose.Schema(
     },
     emailOTPExpiry: {
       type: Date,
+      select: false,
+    },
+    isTemporary: {
+      type: Boolean,
+      default: false,
       select: false,
     },
     role: {

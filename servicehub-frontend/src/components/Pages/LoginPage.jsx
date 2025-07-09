@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import axiosInstance from '../../api/axiosInstance';
+import { useAuth } from '../../context/AuthContext';
 import Loader from '../Loader';
 
 const brandAccent = '#5c7c89';
@@ -20,18 +21,57 @@ export default function LoginPage() {
   const [otpSent, setOTPSent] = useState(false);
   const [otpLoading, setOTPLoading] = useState(false);
   const [otpVerified, setOTPVerified] = useState(false);
+  
+  // Registration OTP states
+  const [regOtpSent, setRegOtpSent] = useState(false);
+  const [regOtpVerified, setRegOtpVerified] = useState(false);
+  const [regOtp, setRegOtp] = useState('');
+  const [regOtpLoading, setRegOtpLoading] = useState(false);
+  
+  // Resend OTP timers
+  const [regOtpTimer, setRegOtpTimer] = useState(0);
+  const [loginOtpTimer, setLoginOtpTimer] = useState(0);
+  
   const navigate = useNavigate();
+  const { login } = useAuth();
+
+  // Timer effects for OTP resend
+  useEffect(() => {
+    let interval = null;
+    if (regOtpTimer > 0) {
+      interval = setInterval(() => {
+        setRegOtpTimer(timer => timer - 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [regOtpTimer]);
+
+  useEffect(() => {
+    let interval = null;
+    if (loginOtpTimer > 0) {
+      interval = setInterval(() => {
+        setLoginOtpTimer(timer => timer - 1);
+      }, 1000);
+    } else {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [loginOtpTimer]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  // Login OTP functions
   const handleSendOTP = async () => {
     setOTPLoading(true);
     setMessage('');
     try {
       await axiosInstance.post('/auth/send-otp', { email: form.email });
       setOTPSent(true);
+      setLoginOtpTimer(60); // Start 60 second timer
       setMessage('OTP sent to your email.');
     } catch (err) {
       setMessage(
@@ -51,12 +91,103 @@ export default function LoginPage() {
       await axiosInstance.post('/auth/verify-otp', { email: form.email, otp });
       setOTPVerified(true);
       setMessage('Login successful! Redirecting...');
-      setTimeout(() => navigate('/'), 1200); // Redirect after 1.2s
+      setTimeout(() => navigate('/'), 1200);
     } catch (err) {
       setMessage(
         err.response?.data?.message ||
         err.response?.data?.error ||
         'Invalid OTP. Please try again.'
+      );
+    } finally {
+      setOTPLoading(false);
+    }
+  };
+
+  // Registration OTP functions
+  const handleSendRegOTP = async () => {
+    if (!form.email || !form.username || !form.name || !form.password) {
+      setMessage('Please fill in all fields before verifying email.');
+      return;
+    }
+    
+    setRegOtpLoading(true);
+    setMessage('');
+    try {
+      await axiosInstance.post('/auth/send-otp', { 
+        email: form.email, 
+        purpose: 'registration' 
+      });
+      setRegOtpSent(true);
+      setRegOtpTimer(60); // Start 60 second timer
+      setMessage('OTP sent to your email for verification.');
+    } catch (err) {
+      setMessage(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Failed to send OTP. Please try again.'
+      );
+    } finally {
+      setRegOtpLoading(false);
+    }
+  };
+
+  const handleVerifyRegOTP = async () => {
+    setRegOtpLoading(true);
+    setMessage('');
+    try {
+      await axiosInstance.post('/auth/verify-otp', { email: form.email, otp: regOtp });
+      setRegOtpVerified(true);
+      setRegOtpTimer(0); // Stop timer on verification
+      setMessage('Email verified! You can now create your account.');
+    } catch (err) {
+      setMessage(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Invalid OTP. Please try again.'
+      );
+    } finally {
+      setRegOtpLoading(false);
+    }
+  };
+
+  // Resend OTP functions
+  const handleResendRegOTP = async () => {
+    if (regOtpTimer > 0) return; // Prevent resend if timer is active
+    
+    setRegOtpLoading(true);
+    setMessage('');
+    try {
+      await axiosInstance.post('/auth/send-otp', { 
+        email: form.email, 
+        purpose: 'registration' 
+      });
+      setRegOtpTimer(60); // Restart 60 second timer
+      setMessage('OTP resent to your email.');
+    } catch (err) {
+      setMessage(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Failed to resend OTP. Please try again.'
+      );
+    } finally {
+      setRegOtpLoading(false);
+    }
+  };
+
+  const handleResendLoginOTP = async () => {
+    if (loginOtpTimer > 0) return; // Prevent resend if timer is active
+    
+    setOTPLoading(true);
+    setMessage('');
+    try {
+      await axiosInstance.post('/auth/send-otp', { email: form.email });
+      setLoginOtpTimer(60); // Restart 60 second timer
+      setMessage('OTP resent to your email.');
+    } catch (err) {
+      setMessage(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Failed to resend OTP. Please try again.'
       );
     } finally {
       setOTPLoading(false);
@@ -69,17 +200,27 @@ export default function LoginPage() {
     setLoading(true);
     try {
       if (isLogin) {
-        // Login: only send email and password
-        const res = await axiosInstance.post('/auth/login', {
+        // Login: use AuthContext login method
+        const result = await login({
           email: form.email,
           password: form.password,
         });
-        setMessage('Login successful!');
-        localStorage.setItem('accessToken', res.data.data?.accessToken);
-        setTimeout(() => navigate('/'), 1000);
+        
+        if (result.success) {
+          setMessage('Login successful!');
+          setTimeout(() => navigate('/'), 1000);
+        } else {
+          setMessage(result.message || 'Login failed. Please try again.');
+        }
       } else {
-        // Register: send all fields
-        const res = await axiosInstance.post('/auth/register', {
+        // Register: check if email is verified first
+        if (!regOtpVerified) {
+          setMessage('Please verify your email before creating account.');
+          setLoading(false);
+          return;
+        }
+        
+        await axiosInstance.post('/auth/register', {
           username: form.username,
           name: form.name,
           email: form.email,
@@ -88,6 +229,10 @@ export default function LoginPage() {
         setMessage('Account created successfully! Please log in.');
         setIsLogin(true);
         setForm(initialForm);
+        // Reset registration OTP states
+        setRegOtpSent(false);
+        setRegOtpVerified(false);
+        setRegOtp('');
       }
     } catch (err) {
       setMessage(
@@ -104,6 +249,17 @@ export default function LoginPage() {
     setIsLogin((prev) => !prev);
     setMessage('');
     setForm(initialForm);
+    // Reset all OTP states
+    setShowOTP(false);
+    setOTPSent(false);
+    setOTPVerified(false);
+    setOTP('');
+    setRegOtpSent(false);
+    setRegOtpVerified(false);
+    setRegOtp('');
+    // Reset timers
+    setRegOtpTimer(0);
+    setLoginOtpTimer(0);
   };
 
   if (loading) return <Loader />;
@@ -139,15 +295,80 @@ export default function LoginPage() {
                 required
                 maxLength={50}
               />
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={form.email}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-[#5c7c89]"
-                required
-              />
+              <div className="relative">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                  value={form.email}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-[#5c7c89] ${regOtpVerified ? 'bg-green-50 border-green-300' : ''}`}
+                  required
+                  disabled={regOtpVerified}
+                />
+                {regOtpVerified && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-600 font-bold">✓</span>
+                )}
+              </div>
+              
+              {/* Email verification section for registration */}
+              {!regOtpSent && !regOtpVerified && (
+                <button
+                  type="button"
+                  className="w-full bg-gradient-to-r from-[#5c7c89] to-[#1f4959] hover:from-[#1f4959] hover:to-[#5c7c89] text-white font-semibold py-2 rounded-md transition-all duration-300 shadow"
+                  onClick={handleSendRegOTP}
+                  disabled={regOtpLoading}
+                >
+                  {regOtpLoading ? 'Sending OTP...' : 'Verify Email'}
+                </button>
+              )}
+              
+              {regOtpSent && !regOtpVerified && (
+                <div className="space-y-2">
+                  <div className="flex gap-2 items-center">
+                    <input
+                      type="text"
+                      placeholder="Enter OTP"
+                      value={regOtp}
+                      onChange={e => setRegOtp(e.target.value)}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:border-[#5c7c89]"
+                      maxLength={6}
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="bg-gradient-to-r from-[#5c7c89] to-[#1f4959] hover:from-[#1f4959] hover:to-[#5c7c89] text-white px-4 py-2 rounded-md font-semibold transition-all duration-300 shadow"
+                      onClick={handleVerifyRegOTP}
+                      disabled={regOtpLoading}
+                    >
+                      {regOtpLoading ? 'Verifying...' : 'Verify'}
+                    </button>
+                  </div>
+                  <div className="text-center">
+                    {regOtpTimer > 0 ? (
+                      <span className="text-gray-500 text-sm">
+                        Resend OTP in {regOtpTimer}s
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        className="text-blue-500 hover:text-blue-600 text-sm font-semibold underline"
+                        onClick={handleResendRegOTP}
+                        disabled={regOtpLoading}
+                      >
+                        {regOtpLoading ? 'Sending...' : 'Resend OTP'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {regOtpVerified && (
+                <div className="text-green-600 text-center font-semibold bg-green-50 py-2 rounded-md">
+                  ✓ Email verified successfully!
+                </div>
+              )}
+
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -171,6 +392,7 @@ export default function LoginPage() {
               </div>
             </>
           )}
+          
           {/* Login/OTP fields */}
           {isLogin && (
             <>
@@ -185,6 +407,7 @@ export default function LoginPage() {
               />
             </>
           )}
+          
           {/* Send OTP button after email input in OTP session */}
           {showOTP && !otpSent && (
             <button
@@ -196,6 +419,7 @@ export default function LoginPage() {
               {otpLoading ? 'Sending OTP...' : 'Send OTP'}
             </button>
           )}
+          
           {/* Password field for normal login */}
           {isLogin && !showOTP && (
             <div className="relative">
@@ -220,43 +444,70 @@ export default function LoginPage() {
               </button>
             </div>
           )}
+          
           {/* OTP input and verify button after OTP is sent */}
           {showOTP && otpSent && (
-            <div className="flex gap-2 items-center mt-2">
-              <input
-                type="text"
-                name="otp"
-                placeholder="Enter OTP"
-                value={otp}
-                onChange={e => setOTP(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5c7c89] bg-[#f9fbfc] text-lg shadow-sm"
-                maxLength={6}
-                required
-                disabled={otpVerified}
-              />
-              <button
-                type="button"
-                className="bg-gradient-to-r from-[#5c7c89] to-[#1f4959] text-white px-5 py-3 rounded-lg font-bold shadow hover:from-[#1f4959] hover:to-[#5c7c89] transition-all"
-                onClick={handleVerifyOTP}
-                disabled={otpLoading || otpVerified}
-              >
-                {otpLoading ? 'Verifying...' : otpVerified ? 'Verified' : 'Verify OTP'}
-              </button>
+            <div className="space-y-2 mt-2">
+              <div className="flex gap-2 items-center">
+                <input
+                  type="text"
+                  name="otp"
+                  placeholder="Enter OTP"
+                  value={otp}
+                  onChange={e => setOTP(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-[#5c7c89] bg-[#f9fbfc] text-lg shadow-sm"
+                  maxLength={6}
+                  required
+                  disabled={otpVerified}
+                />
+                <button
+                  type="button"
+                  className="bg-gradient-to-r from-[#5c7c89] to-[#1f4959] text-white px-5 py-3 rounded-lg font-bold shadow hover:from-[#1f4959] hover:to-[#5c7c89] transition-all"
+                  onClick={handleVerifyOTP}
+                  disabled={otpLoading || otpVerified}
+                >
+                  {otpLoading ? 'Verifying...' : otpVerified ? 'Verified' : 'Verify OTP'}
+                </button>
+              </div>
+              <div className="text-center">
+                {loginOtpTimer > 0 ? (
+                  <span className="text-gray-500 text-sm">
+                    Resend OTP in {loginOtpTimer}s
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    className="text-blue-500 hover:text-blue-600 text-sm font-semibold underline"
+                    onClick={handleResendLoginOTP}
+                    disabled={otpLoading || otpVerified}
+                  >
+                    {otpLoading ? 'Sending...' : 'Resend OTP'}
+                  </button>
+                )}
+              </div>
             </div>
           )}
+          
           {showOTP && otpVerified && (
             <div className="text-green-600 text-center mt-2 font-semibold">OTP verified! You can now reset your password.</div>
           )}
+          
           {/* Login/Register/Reset button */}
           {!showOTP && (
             <button
               type="submit"
-              className="w-full bg-[#5c7c89] hover:bg-[#4e6a78] text-white font-semibold py-2 rounded-md transition duration-300 shadow-md"
+              className={`w-full font-semibold py-2 rounded-md transition duration-300 shadow-md ${
+                !isLogin && !regOtpVerified 
+                  ? 'bg-gray-400 cursor-not-allowed text-white' 
+                  : 'bg-[#5c7c89] hover:bg-[#4e6a78] text-white'
+              }`}
+              disabled={!isLogin && !regOtpVerified}
             >
               {loading ? <Loader size={20} color="white" /> : isLogin ? 'Login' : 'Create Account'}
             </button>
           )}
         </form>
+        
         {/* Forgot password/OTP login link */}
         {isLogin && !showOTP && (
           <div className="mt-4 text-center">
@@ -268,9 +519,11 @@ export default function LoginPage() {
             </button>
           </div>
         )}
+        
         {message && (
           <div className={`mt-4 text-center font-medium ${message.includes('success') || message.includes('verified') ? 'text-green-600' : 'text-red-600'}`}>{message}</div>
         )}
+        
         <div className="mt-6 text-center">
           {isLogin ? (
             <>
