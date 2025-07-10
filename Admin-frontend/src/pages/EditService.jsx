@@ -153,6 +153,41 @@ const EditService = () => {
               />
             )}
           </div>
+          
+          {/* Video Upload Section */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Service Video <span className="text-gray-500">(Optional)</span>
+            </label>
+            <input
+              type="file"
+              name="video"
+              accept="video/*"
+              onChange={handleVideoChange}
+              className="w-full px-4 py-2 rounded-md border border-gray-300 bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-md file:border-0
+              file:text-sm file:font-semibold
+              file:bg-[#e3e8ee] file:text-[#1f4959]
+              hover:file:bg-[#d1d5db]"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Upload a demonstration video for this service (Max: 100MB, MP4/AVI/MOV)
+            </p>
+            {previewVideo && (
+              <div className="mt-2">
+                <video
+                  src={previewVideo}
+                  className="w-32 h-20 object-cover rounded-md border border-gray-200 shadow"
+                  controls
+                  muted
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            )}
+          </div>
+          
           <div className="mt-6">
             <button
               type="submit"

@@ -14,6 +14,7 @@ export default function InnerService() {
   const [services, setServices] = useState([]); // subservices
   const [selectedService, setSelectedService] = useState('');
   const [nestedItems, setNestedItems] = useState([]);
+  const [serviceData, setServiceData] = useState(null); // Store the main service data with video
 
   // Fetch subservices for the selected service name
   useEffect(() => {
@@ -26,6 +27,24 @@ export default function InnerService() {
             image: s.image || "❓"
           })));
           if (subservices.length > 0) setSelectedService(subservices[0].category);
+        });
+    }
+  }, [serviceName]);
+
+  // Fetch main service data (including video) based on serviceName
+  useEffect(() => {
+    if (serviceName) {
+      api.get('/service')
+        .then(res => {
+          const allServices = res.data.data || [];
+          const currentService = allServices.find(service => 
+            service.serviceName === serviceName
+          );
+          setServiceData(currentService || null);
+        })
+        .catch(err => {
+          console.error('Error fetching service data:', err);
+          setServiceData(null);
         });
     }
   }, [serviceName]);
@@ -155,10 +174,27 @@ export default function InnerService() {
         <div className="w-full md:w-3/4 space-y-10">
           {/* Video Section */}
           <div className="rounded-xl overflow-hidden shadow-md bg-[#e6f2f1] p-4 border-2 border-[#5c7c89]">
-            <video className="w-full rounded-xl" controls poster="/images/video-poster.png">
-              <source src="/video/women-salon.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
+            {serviceData && serviceData.video ? (
+              <video className="w-full rounded-xl" controls poster={serviceData.image || "/images/video-poster.png"}>
+                <source src={serviceData.video} type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            ) : serviceData && serviceData.image ? (
+              <div className="relative">
+                <img 
+                  src={serviceData.image} 
+                  alt={serviceName}
+                  className="w-full rounded-xl object-cover h-64"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center rounded-xl">
+                  <p className="text-white text-lg font-semibold">No demo video available</p>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-64 bg-gray-200 rounded-xl flex items-center justify-center">
+                <p className="text-gray-500 text-lg">Loading service content...</p>
+              </div>
+            )}
             <div className="mt-4 text-center">
               <h3 className="text-xl font-semibold text-[#1f4959] mb-1">
                 ServiceHub Company | {selectedService || serviceName}
@@ -167,7 +203,7 @@ export default function InnerService() {
                 className="inline-block mt-2 px-4 py-2 text-white rounded-full text-sm"
                 style={{ backgroundColor: brandColor }}
               >
-                Starting @ ₹399 only
+                {serviceData ? `Starting @ ₹${serviceData.price} only` : 'Starting @ ₹399 only'}
               </p>
             </div>
           </div>
@@ -179,7 +215,7 @@ export default function InnerService() {
               {nestedItems.length === 0 ? (
                 <p className="text-[#5c7c89]">No packages available for this service.</p>
               ) : (
-                nestedItems.map((item, i) => {
+                nestedItems.map((item) => {
                   const key = item._id || item.id || item.name;
                   return (
                     <div
