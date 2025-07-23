@@ -1,5 +1,6 @@
 <p align="center">
-  <img src="https://your-screenshot-link.com/banner.png" alt="ServiceHub Banner" width="100%" />
+  <img src="https://<img width="1444" height="778" alt="Screenshot 2025-07-21 165846" src="https://github.com/user-attachments/assets/e2ff7348-5d99-4f2a-a998-8dddbfdafda5" />
+" alt="ServiceHub Banner" width="100%" />
 </p>
 
 <h1 align="center">🚀 ServiceHub</h1>
@@ -18,7 +19,9 @@
 
 | User Interface | Admin Dashboard |
 |----------------|-----------------|
-| ![User UI](https://your-screenshot-link.com/user-ui.png) | ![Admin UI](<img width="1913" height="880" alt="Screenshot 2025-07-21 164010" src="https://github.com/user-attachments/assets/411037f7-9277-4943-9352-b46b5978e98e" />
+| ![User UI](<img width="1913" height="880" alt="Screenshot 2025-07-21 164010" src="https://github.com/user-attachments/assets/411037f7-9277-4943-9352-b46b5978e98e" />
+) | | ![Admin UI](
+<img width="1914" height="866" alt="Screenshot 2025-07-21 165933" src="https://github.com/user-attachments/assets/3072a430-3b91-4824-8667-50400daba9c0" />
 ) |
 
 ---
