@@ -18,7 +18,8 @@
 
 | User Interface | Admin Dashboard |
 |----------------|-----------------|
-| ![User UI](https://your-screenshot-link.com/user-ui.png) | ![Admin UI](https://your-screenshot-link.com/admin-ui.png) |
+| ![User UI](https://your-screenshot-link.com/user-ui.png) | ![Admin UI](<img width="1913" height="880" alt="Screenshot 2025-07-21 164010" src="https://github.com/user-attachments/assets/411037f7-9277-4943-9352-b46b5978e98e" />
+) |
 
 ---
 
