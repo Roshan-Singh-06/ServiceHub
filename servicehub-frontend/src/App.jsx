@@ -14,6 +14,7 @@ import SubServiceList from './components/Pages/SubService.jsx';
 import Cart from './components/Pages/Cart.jsx';
 import InnerService from './components/Pages/InnerService.jsx';
 import Booking from './components/Pages/Booking.jsx';
+import AIAssistant from './components/AIAssistant/AIAssistant.jsx';
 
 export default function App() {
   return (
@@ -41,6 +42,8 @@ export default function App() {
             <Route path="/innerservice" element={<InnerService />} />
             <Route path="/innerservice/:serviceName" element={<InnerService/>} />
           </Routes>
+          {/* AI Assistant available on all pages */}
+          <AIAssistant />
         </Router>
       </AuthProvider>
     </ErrorBoundary>
